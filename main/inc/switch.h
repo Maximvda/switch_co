@@ -1,9 +1,15 @@
 #ifndef __SWITCH_H_
 #define __SWITCH_H_
 
-class Switch {
+#include "can_driver.h"
+
+namespace switch_co {
+    void on_can_msg(driver::can::message_t message);
+}
+
+class SwitchCo {
     public:
-        Switch();
+        SwitchCo();
         void heartbeat();
 };
 

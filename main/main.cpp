@@ -1,7 +1,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <stdio.h>
-#include "can.h"
+#include "can_driver.h"
 
 #define RX_TASK_PRIO 8
 
