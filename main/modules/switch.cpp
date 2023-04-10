@@ -1,4 +1,15 @@
-#include "switchCo.h"
+#include "switch.h"
+
+Switch::Switch(){
+
+};
+
+void Switch::heartbeat(){
+
+}
+
+
+
 //globals
 boolean off_template[8]={false,false,false,false,false,false,false,false};
 boolean fade_up[7]={true,true,true,true,true,true,true};
