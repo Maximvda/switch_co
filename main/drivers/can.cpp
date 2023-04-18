@@ -4,7 +4,7 @@
 
 using namespace driver;
 
-const char* TAG = "can driver";
+const static char* TAG = "can driver";
 static can::message_t rec_message;
 
 void can::init(){

@@ -6,10 +6,11 @@
 #include "esp_log.h"
 
 using namespace driver;
-const char* TAG = "GPIO";
+const static char* TAG = "GPIO";
 
-static Gpio gpio_driver;
 static QueueHandle_t gpioQueue {xQueueCreate(10, sizeof(uint8_t))};
+static void (*toggle_callback)(uint8_t id);
+
 
 static void IRAM_ATTR gpio_interrupt_handler(void *args)
 {
@@ -22,18 +23,25 @@ static void gpio::task(void* pxptr){
     while (1){
         if (xQueueReceive(gpioQueue, &pin_number, portMAX_DELAY))
         {
-            gpio_driver.toggle_input(pin_number);
+            toggle_callback(pin_number);
         }
     }
 }
 
-void Gpio(){};
+Gpio::Gpio(){};
+
+Gpio::Gpio(void (*_callback)(uint8_t id)){
+    toggle_callback = _callback;
+}
 
 bool Gpio::init(){
     bool res {false};
     res = init_input();
     res = init_output() and res;
     xTaskCreate(gpio::task, "gpio_task", 2048, NULL, 1, NULL);
+    if (!res){
+        ESP_LOGE(TAG, "Failed to initialise");
+    }
     return res;
 }
 
@@ -78,8 +86,4 @@ bool Gpio::init_output(){
         return false;
     }
     return true;
-}
-
-void Gpio::toggle_input(uint8_t number){
-    input_state[number] = !input_state[number];
 }
