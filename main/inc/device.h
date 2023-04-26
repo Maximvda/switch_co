@@ -2,6 +2,7 @@
 #define __DEVICE_H_
 
 #include "input.h"
+#include "output.h"
 #include "gpio.h"
 
 namespace device {
@@ -12,6 +13,7 @@ namespace device {
 class Device {
     private:
         Input inputs[TOTAL_GPIO];
+        Output outputs[TOTAL_GPIO];
 
     public:
         Device();
