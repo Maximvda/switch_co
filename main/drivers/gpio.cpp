@@ -28,6 +28,10 @@ void gpio::set_level(uint8_t id, uint32_t level){
     ledc_update_duty(LEDC_HIGH_SPEED_MODE, channel);
 }
 
+int gpio::get_level(uint8_t id){
+    return gpio_get_level(input_arr[id]);
+}
+
 void gpio::task(void* pxptr){
     uint8_t pin_number {0};
     while (1){

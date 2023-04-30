@@ -14,6 +14,7 @@ namespace driver {
         void set_output(uint8_t id, uint32_t value);
         bool change_output(uint8_t id, bool pwm, uint32_t level);
         void set_level(uint8_t id, uint32_t level);
+        int get_level(uint8_t id);
 
         void task(void* pxptr);
 

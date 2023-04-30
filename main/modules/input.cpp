@@ -5,6 +5,8 @@
 #include "config.h"
 #include "esp_log.h"
 #include "device.h"
+#include "can_driver.h"
+#include "gpio.h"
 
 #define PRESS_DELAY 0.4*1000*1000
 //#define PERIODIC_DELAY 0.01*1000*1000
@@ -33,6 +35,19 @@ Input::Input(uint8_t new_id, void (*_callback)(void* arg), void (*_hold_callback
         .arg = &this->id
     };
     esp_timer_create(&periodic_timer_args, &hold_timer);
+}
+
+void Input::handle_message(driver::can::message_t can_mes){
+    switch(can_mes.function_address){
+        case 0xFF: // Request state (doing in end of call)
+            break;
+        default:
+            break;
+    }
+    // Always aknowledge and return state
+    can_mes.ack = true;
+    uint8_t value = static_cast<uint8_t>(driver::gpio::get_level(id));
+    driver::can::transmit(can_mes, 1, &value);
 }
 
 void Input::press_callback(){
