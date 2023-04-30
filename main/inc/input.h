@@ -9,18 +9,19 @@ class Input {
         uint8_t id {0};
         bool button {false};
         bool state {false};
-        static void hold_callback(void* arg);
-        static void press_callback(void* arg);
-        static void start_periodic(void* arg);
         esp_timer_handle_t press_timer;
-        static esp_timer_handle_t hold_timer;
-        uint8_t current_press {0};
+        esp_timer_handle_t hold_timer;
+        volatile uint8_t current_press {0};
+        volatile bool hold_active {false};
 
     public:
         Input();
-        explicit Input(uint8_t id);
+        explicit Input(uint8_t id, void (*_callback)(void* arg), void (*_hold_callback)(void* arg));
         void heartbeat();
         void toggle();
+        void set_button(bool value);
+        void press_callback();
+        void hold_callback();
 };
 
 #endif

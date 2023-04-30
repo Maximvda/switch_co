@@ -11,27 +11,12 @@ namespace driver {
     namespace gpio {
 
         bool init(void (*_callback)(uint8_t id));
-        void set_output(uint8_t id, uint8_t value);
+        void set_output(uint8_t id, uint32_t value);
+        bool change_output(uint8_t id, bool pwm, uint32_t level);
+        void set_level(uint8_t id, uint32_t level);
 
-        enum inputs {
-            INPUT_0,
-            INPUT_1,
-            INPUT_2,
-            INPUT_3,
-            INPUT_4,
-            INPUT_5,
-            INPUT_6
-        };
+        void task(void* pxptr);
 
-        enum outputs {
-            OUTPUT_0,
-            OUTPUT_1,
-            OUTPUT_2,
-            OUTPUT_3,
-            OUTPUT_4,
-            OUTPUT_5,
-            OUTPUT_6
-        };
     }
 
 }

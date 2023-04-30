@@ -13,8 +13,9 @@ namespace output {
 
 class Output {
     private:
-        uint8_t id {0};
+        uint8_t id;
         bool pwm {false};
+        bool state;
 
     public:
         Output();
@@ -22,7 +23,7 @@ class Output {
 
         void toggle(void);
         void set_state(bool on);
-        void set_pwm(uint8_t level);
+        void set_pwm(uint32_t level);
         void run_effect(output::Effect effect);
 };
 

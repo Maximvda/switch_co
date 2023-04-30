@@ -12,17 +12,17 @@ namespace device {
 
 class Device {
     private:
-        Input inputs[TOTAL_GPIO];
         Output outputs[TOTAL_GPIO];
 
     public:
         Device();
         void init();
         void heartbeat();
-        static void toggle_switch(uint8_t switch_id);
+        void toggle_switch(uint8_t switch_id);
         void double_press_switch(uint8_t switch_id);
         void hold_switch(uint8_t switch_id);
         void release_switch(uint8_t switch_id);
+        Input inputs[TOTAL_GPIO];
 };
 
 #endif
