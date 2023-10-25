@@ -1,74 +1,33 @@
-#include "gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
+#include "gpio.hpp"
+
+#include "supervisor.hpp"
+
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "driver/ledc.h"
 #include "esp_err.h"
 
-using namespace driver;
-const static char* TAG = "GPIO";
+using driver::GpioDriver;
+const static char* TAG = "gpio driver";
+static void IRAM_ATTR gpio_interrupt_handler(void *args);
 
-static gpio_num_t input_arr[TOTAL_GPIO] {GPIO_NUM_15,GPIO_NUM_33,GPIO_NUM_26,GPIO_NUM_27,GPIO_NUM_13,GPIO_NUM_4,GPIO_NUM_16};
-static gpio_num_t output_arr[TOTAL_GPIO] {GPIO_NUM_23,GPIO_NUM_25,GPIO_NUM_14,GPIO_NUM_12,GPIO_NUM_19,GPIO_NUM_18,GPIO_NUM_17};
-
-static QueueHandle_t gpioQueue {xQueueCreate(10, sizeof(uint8_t))};
-static void (*toggle_callback)(uint8_t id);
-
-
-void gpio::set_output(uint8_t id, uint32_t value){
-    gpio_set_level(output_arr[id], value);
-    ESP_LOGI(TAG, "Set level for id %u, pin number, %lu with value %lu", id, static_cast<uint32_t>(output_arr[id]), static_cast<uint32_t>(value));
-}
-
-void gpio::set_level(uint8_t id, uint32_t level){
-    ledc_channel_t channel = static_cast<ledc_channel_t>(id);
-    ledc_set_duty(LEDC_HIGH_SPEED_MODE, channel, level);
-    ledc_update_duty(LEDC_HIGH_SPEED_MODE, channel);
-}
-
-int gpio::get_level(uint8_t id){
-    return gpio_get_level(input_arr[id]);
-}
-
-void gpio::task(void* pxptr){
-    uint8_t pin_number {0};
-    while (1){
-        if (xQueueReceive(gpioQueue, &pin_number, portMAX_DELAY))
-        {
-            toggle_callback(pin_number);
-        }
-    }
-}
-
-static void IRAM_ATTR gpio_interrupt_handler(void *args)
+bool GpioDriver::init()
 {
-    uint8_t pin_number = (int)args;
-    xQueueSendFromISR(gpioQueue, &pin_number, NULL);
-}
-
-
-bool input_init();
-bool output_init();
-bool init_led_timer();
-
-bool gpio::init(void (*_callback)(uint8_t id)){
-    toggle_callback = _callback;
-    bool res {false};
-    res = input_init();
-    res = output_init() and res;
-    res = init_led_timer() and res;
+    ESP_LOGI(TAG, "Initialising");
+    bool res = initInput();
+    res &= initOutput();
+    res &= initLed();
     if (!res){
         ESP_LOGE(TAG, "Failed to initialise");
     }
     return res;
 }
 
-bool input_init(){
+bool GpioDriver::initInput()
+{
     uint64_t input_mask {0};
-    for (int i=0; i < TOTAL_GPIO; i++){
-        input_mask |= ( 1ULL << input_arr[i]);
+    for (int i=0; i < GpioDriver::total_gpio; i++){
+        input_mask |= ( 1ULL << inputs_[i]);
     }
 
     gpio_config_t config = {};
@@ -81,35 +40,33 @@ bool input_init(){
     if (gpio_config(&config) != ESP_OK){
         ESP_LOGE(TAG, "Failed to set input config");
         return false;
-    } else {
-        ESP_LOGI(TAG, "Input config set.");
     }
 
+    ESP_LOGI(TAG, "Input config set.");
+
     gpio_install_isr_service(0);
-    // Read the current gpio states
-    for (int i=0; i < TOTAL_GPIO; i++){
-        gpio_isr_handler_add(input_arr[i], gpio_interrupt_handler, (void *)i);
+    for (int i=0; i < GpioDriver::total_gpio; i++){
+        gpio_isr_handler_add(inputs_[i], gpio_interrupt_handler, (void *)i);
     }
     ESP_LOGI(TAG, "ISR configured.");
     return true;
 }
 
-bool output_init(){
+bool GpioDriver::initOutput()
+{
     uint32_t output_mask {0};
-    for (int i=0; i < TOTAL_GPIO; i++){
-        output_mask |= (1ULL << output_arr[i]);
+    for (int i=0; i < GpioDriver::total_gpio; i++){
+        output_mask |= (1ULL << outputs_[i]);
     }
     gpio_config_t config;
     config.pin_bit_mask = output_mask;
     config.mode = GPIO_MODE_OUTPUT;
-    if (gpio_config(&config) != ESP_OK){
-        ESP_LOGE(TAG, "Failed to set output config");
-        return false;
-    }
-    return true;
+
+    return gpio_config(&config) == ESP_OK;
 }
 
-bool init_led_timer(void){
+bool GpioDriver::initLed()
+{
     // Prepare and then apply the LEDC PWM timer configuration
     ledc_timer_config_t ledc_timer = {
         .speed_mode       = LEDC_HIGH_SPEED_MODE,
@@ -121,21 +78,60 @@ bool init_led_timer(void){
     return ledc_timer_config(&ledc_timer) == ESP_OK;
 }
 
-bool gpio::change_output(uint8_t id, bool pwm, uint32_t level){
-    ledc_channel_t channel = static_cast<ledc_channel_t>(id);
-    if (pwm){
-        ledc_channel_config_t ledc_channel = {
-            .gpio_num       = output_arr[id],
-            .speed_mode     = LEDC_HIGH_SPEED_MODE,
-            .channel        = channel,
-            .intr_type      = LEDC_INTR_DISABLE,
-            .timer_sel      = LEDC_TIMER_0,
-            .duty           = level, // Set duty to 0%
-            .hpoint         = 0,
-            .flags = {0}
-        };
-        return ledc_channel_config(&ledc_channel) == ESP_OK;
+bool GpioDriver::setOutput(uint8_t id, std::variant<bool, uint8_t> value)
+{
+    auto& state = output_states_[id];
+    if (std::holds_alternative<bool>(value))
+    {
+        /* When output pin is in pwm we have to reconfigure it */
+        if (state.pwm_mode)
+        {
+            changeOutput(id);
+        }
+        /* Just toggling the output pin */
+        state.high = std::get<bool>(value);
+        return gpio_set_level(outputs_[id], static_cast<uint32_t>(state.high)) == ESP_OK;
     }
-    // Setting config for normal output
-    return ledc_stop(LEDC_HIGH_SPEED_MODE, channel, level) == ESP_OK;
+
+    /* Should hold uint8_t alternative otherwise programming error! */
+    assert(std::holds_alternative<uint8_t>(value));
+
+    if (!state.pwm_mode)
+    {
+        changeOutput(id);
+    }
+
+    state.pwm_level = std::get<uint8_t>(value);
+
+    ledc_channel_t channel = static_cast<ledc_channel_t>(id);
+    ledc_set_duty(LEDC_HIGH_SPEED_MODE, channel, static_cast<uint32_t>(state.pwm_level));
+    return ledc_update_duty(LEDC_HIGH_SPEED_MODE, channel) == ESP_OK;
+}
+
+bool GpioDriver::changeOutput(const uint8_t id)
+{
+    ledc_channel_t channel = static_cast<ledc_channel_t>(id);
+    auto& state = output_states_[id];
+    if (state.pwm_mode){
+        state.pwm_mode = false;
+        return ledc_stop(LEDC_HIGH_SPEED_MODE, channel, state.high) == ESP_OK;
+    }
+    state.pwm_mode = true;
+    /* Change config to pwm mode */
+    ledc_channel_config_t ledc_channel = {
+        .gpio_num       = outputs_[id],
+        .speed_mode     = LEDC_HIGH_SPEED_MODE,
+        .channel        = channel,
+        .intr_type      = LEDC_INTR_DISABLE,
+        .timer_sel      = LEDC_TIMER_0,
+        .duty           = state.pwm_level, // Set duty to 0%
+        .hpoint         = 0,
+        .flags = {0}
+    };
+    return ledc_channel_config(&ledc_channel) == ESP_OK;
+}
+
+static void IRAM_ATTR gpio_interrupt_handler(void *args)
+{
+    app::taskFinder().gpio().isrGpioToggle((uint32_t)args);
 }

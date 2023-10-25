@@ -1,11 +1,14 @@
-#include "config.h"
+#include "config.hpp"
+
 #include "nvs_flash.h"
 #include "esp_log.h"
 
 const static char* TAG = "config";
 static nvs_handle_t my_handle;
 
-void config::init(){
+using driver::ConfigDriver;
+
+void ConfigDriver::init(){
     // Initialize NVS
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -23,13 +26,45 @@ void config::init(){
     }
 }
 
-uint8_t config::get_key(const char* key){
+uint8_t ConfigDriver::getKey(const char* key){
     int8_t value {0};
     nvs_get_i8(my_handle, key, &value);
     return static_cast<uint8_t>(value);
 }
 
-void config::set_key(const char* key, uint8_t value){
+void ConfigDriver::setKey(const char* key, uint8_t value){
     nvs_set_i8(my_handle, key, value);
     nvs_commit(my_handle);
+}
+
+char* ConfigDriver::getString(const char* key, size_t length){
+    char* savedData = NULL;
+    length = sizeof(savedData);
+    nvs_get_str(my_handle, key, savedData, &length);
+    length = sizeof(savedData);
+    return savedData;
+}
+
+void ConfigDriver::setString(const char* key, const char* value){
+    nvs_set_str(my_handle, key, value);
+    nvs_commit(my_handle);
+}
+
+uint8_t ConfigDriver::deviceId()
+{
+    return getKey("device_id");
+}
+
+bool ConfigDriver::outputPwmMode(uint8_t id)
+{
+    char config_key[6];
+    sprintf(config_key, "mode%c", id);
+    return getKey(config_key) == 1;
+}
+
+uint8_t ConfigDriver::outputLevel(uint8_t id)
+{
+    char config_key[7];
+    sprintf(config_key, "level%c", id);
+    return getKey(config_key);
 }

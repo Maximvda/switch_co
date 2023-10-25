@@ -1,11 +1,4 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include <stdio.h>
-#include "can_driver.h"
-#include "config.h"
-#include "device.h"
-
-#define RX_TASK_PRIO 8
+#include "supervisor.hpp"
 
 extern "C" {
 	void app_main();
@@ -13,8 +6,10 @@ extern "C" {
 
 void app_main(void)
 {
-	config::init();
-	device::init();
-    xTaskCreate(driver::gpio::task, "gpio_task", 2048, NULL, 1, NULL);
-	xTaskCreatePinnedToCore(driver::can::receive_task, "CAN_rx", 4096, NULL, RX_TASK_PRIO, NULL, tskNO_AFFINITY);
+	app::Supervisor::createTask();
+	// config::init();
+	// device::init();
+    // xTaskCreate(driver::gpio::task, "gpio_task", 512, NULL, GPIO_TASK_PRIO, NULL);
+    // //xTaskCreate(driver::can::receive_task, "CAN_rx", 4096, NULL, RX_TASK_PRIO, NULL);
+    // xTaskCreate(on_second, "on_second", 512, NULL, ON_SECOND_PRIO, NULL);
 }

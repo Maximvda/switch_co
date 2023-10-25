@@ -1,7 +1,5 @@
-#ifndef __INPUT_H_
-#define __INPUT_H_
+#pragma once
 
-#include "can_driver.h"
 #include "esp_timer.h"
 
 class Input {
@@ -26,5 +24,3 @@ class Input {
         void press_callback();
         void hold_callback();
 };
-
-#endif
