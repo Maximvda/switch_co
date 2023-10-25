@@ -1,8 +1,9 @@
 #pragma once
 
 #include "standard_task.hpp"
-
 #include  "concurrent.hpp"
+#include "events.h"
+#include "driver/twai.h"
 
 using utils::StandardTask;
 using utils::Milliseconds;
@@ -22,6 +23,11 @@ namespace app {
 		GincoTask(uint32_t priority) : StandardTask(priority) {}
 
 		const char * name() const override { return "ginco"; }
+
+		bool frameReady(twai_message_t& message)
+		{
+			return post(EVENT_CAN_RECEIVED, std::make_unique<twai_message_t>(message));
+		}
 
 	};
 

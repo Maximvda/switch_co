@@ -4,7 +4,7 @@
 #include "ginco_types.hpp"
 
 
-namespace module
+namespace modules
 {
 
     namespace output {

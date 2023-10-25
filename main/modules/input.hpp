@@ -16,7 +16,7 @@ class Input {
         Input();
         explicit Input(uint8_t id, void (*_callback)(void* arg), void (*_hold_callback)(void* arg));
 
-        void handle_message(driver::can::message_t can_mes);
+        // void handle_message(driver::can::message_t can_mes);
 
         void heartbeat();
         void toggle();

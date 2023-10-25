@@ -19,7 +19,8 @@ namespace driver {
 
     class GpioDriver
     {
-    static constexpr uint8_t total_gpio {7};
+    public:
+        static constexpr uint8_t total_gpio {7};
 
     private:
         gpio_num_t inputs_[total_gpio] {GPIO_NUM_15,GPIO_NUM_33,GPIO_NUM_26,GPIO_NUM_27,GPIO_NUM_13,GPIO_NUM_4,GPIO_NUM_16};

@@ -4,6 +4,11 @@
 #include "output.hpp"
 #include "gpio.hpp"
 #include "config.hpp"
+#include "ginco_types.hpp"
+
+using modules::Output;
+using modules::Input;
+using data::GincoMessage;
 
 namespace app
 {
@@ -17,12 +22,12 @@ namespace app
 
         public:
             void init();
-            void heartbeat();
-            void toggle_switch(uint8_t switch_id);
-            void double_press_switch(uint8_t switch_id);
-            void hold_switch(uint8_t switch_id);
-            void release_switch(uint8_t switch_id);
-            void on_can_message(driver::can::message_t message);
+            void handleMessage(GincoMessage& message);
+            // void heartbeat();
+            // void toggle_switch(uint8_t switch_id);
+            // void double_press_switch(uint8_t switch_id);
+            // void hold_switch(uint8_t switch_id);
+            // void release_switch(uint8_t switch_id);
     };
 
 } // namespace app;

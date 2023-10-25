@@ -4,7 +4,7 @@
 
 const static char* TAG = {"Output"};
 
-using module::Output;
+using modules::Output;
 using data::Function;
 
 Output::Output(const uint8_t id, const OutputState state){

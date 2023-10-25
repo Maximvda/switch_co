@@ -1,6 +1,7 @@
 #include "can.hpp"
 
 #include "esp_log.h"
+#include "supervisor.hpp"
 
 using driver::can::CanDriver;
 
@@ -46,7 +47,7 @@ void CanDriver::tick()
         return;
     }
     /* Frame received so send to correct place */
-    //TODO: THIS SHIT
+    app::taskFinder().ginco().frameReady(message);
 }
 
 bool CanDriver::transmit(const twai_message_t& can_mes){
