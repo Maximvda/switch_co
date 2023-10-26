@@ -57,14 +57,21 @@ uint8_t ConfigDriver::deviceId()
 
 bool ConfigDriver::outputPwmMode(uint8_t id)
 {
-    char config_key[6];
-    sprintf(config_key, "mode%c", id);
+    char config_key[8];
+    sprintf(config_key, "o_mode%c", id);
     return getKey(config_key) == 1;
 }
 
 uint8_t ConfigDriver::outputLevel(uint8_t id)
 {
-    char config_key[7];
-    sprintf(config_key, "level%c", id);
+    char config_key[9];
+    sprintf(config_key, "o_level%c", id);
     return getKey(config_key);
+}
+
+bool ConfigDriver::inputMode(uint8_t id)
+{
+    char config_key[7];
+    sprintf(config_key, "i_but%c", id);
+    return getKey(config_key) == 1;
 }

@@ -1,6 +1,5 @@
 #include "device.hpp"
 
-using driver::OutputState;
 using app::Device;
 
 static const char* TAG = {"Device"};
@@ -9,11 +8,6 @@ void Device::init()
 {
     config_driver_.init();
     id_ = config_driver_.deviceId();
-    // for(uint8_t i=0; i < driver::GpioDriver::total_gpio; i++){
-    //     OutputState state;
-    //     inputs[i] = Input(i, press_callback, hold_callback);
-    //     outputs[i] = Output(i);
-    // }
 }
 
 void Device::handleMessage(GincoMessage& message)

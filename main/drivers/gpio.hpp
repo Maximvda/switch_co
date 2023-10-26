@@ -1,21 +1,20 @@
 #pragma once
 
 #include "stdint.h"
+#include "ginco_types.hpp"
 #include "driver/gpio.h"
+
+/* std includes */
+#include <cstdint>
+#include <map>
+#include <vector>
+#include <functional>
 
 #include <variant>
 
-namespace driver {
+using data::OutputState;
 
-    struct OutputState
-    {
-        /* Is the output in pwm mode */
-        bool pwm_mode {false};
-        /* Is the output high or low (only valid for not pwm mode) */
-        bool high {false};
-        /* Indicate sthe pwm level */
-        uint8_t pwm_level {0};
-    };
+namespace driver {
 
     class GpioDriver
     {
@@ -23,11 +22,26 @@ namespace driver {
         static constexpr uint8_t total_gpio {7};
 
     private:
-        gpio_num_t inputs_[total_gpio] {GPIO_NUM_15,GPIO_NUM_33,GPIO_NUM_26,GPIO_NUM_27,GPIO_NUM_13,GPIO_NUM_4,GPIO_NUM_16};
+        using StateChangeCb = std::function<void(uint8_t, bool)>;
         gpio_num_t outputs_[total_gpio] {GPIO_NUM_23,GPIO_NUM_25,GPIO_NUM_14,GPIO_NUM_12,GPIO_NUM_19,GPIO_NUM_18,GPIO_NUM_17};
+        std::pair<gpio_num_t, uint32_t> inputs_[total_gpio] {
+            std::make_pair(GPIO_NUM_15, 0),
+            std::make_pair(GPIO_NUM_33, 0),
+            std::make_pair(GPIO_NUM_26, 0),
+            std::make_pair(GPIO_NUM_27, 0),
+            std::make_pair(GPIO_NUM_13, 0),
+            std::make_pair(GPIO_NUM_4, 0),
+            std::make_pair(GPIO_NUM_16, 0),
+        };
 
         /* Remember in which state the output is. PWM or GPIO */
         OutputState output_states_[total_gpio] {};
+
+        bool checking_input_ {false};
+        /**
+         * @brief This callback is run when input state has changed
+         */
+        StateChangeCb cb_state_change_ {};
 
         bool initInput();
         bool initOutput();
@@ -35,9 +49,19 @@ namespace driver {
 
         bool changeOutput(const uint8_t id);
     public:
-
         bool init();
+
+        /**
+         * @brief Enable input gpio checking
+         * @note When enabling input check one must not forget to reguraly call the Inputcheck function +- every 10ms
+         *
+         *
+         */
+        void enableInputCheck(StateChangeCb cb_state_change);
+
         bool setOutput(uint8_t id, std::variant<bool, uint8_t> value);
+        void inputCheck();
+        bool getLevel(uint8_t id);
     };
 
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "gpio.hpp"
 #include "ginco_types.hpp"
 
+using data::OutputState;
+using data::GincoMessage;
 
 namespace modules
 {
@@ -15,9 +16,6 @@ namespace modules
         };
     }
 
-    using driver::OutputState;
-    using data::GincoMessage;
-
     class Output {
         private:
             uint8_t id_;
@@ -25,7 +23,7 @@ namespace modules
 
         public:
             Output() {};
-            explicit Output(const uint8_t id, const OutputState state);
+            explicit Output(const uint8_t id);
 
             void handleMessage(GincoMessage& message);
             void runEffect(output::Effect effect);

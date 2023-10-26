@@ -7,9 +7,9 @@ const static char* TAG = {"Output"};
 using modules::Output;
 using data::Function;
 
-Output::Output(const uint8_t id, const OutputState state){
+Output::Output(const uint8_t id){
     id_ = id;
-    state_ = state;
+    /*TODO: Get state */
     /*TODO: SET GPIO OUTPUT THROUGH THREAD */
 }
 

@@ -48,7 +48,7 @@ namespace utils
 		using Watchdog = std::function<bool(SupervisedTask&)>;
 
 	private:
-		static constexpr uint32_t default_stack_size = 1024;
+		static constexpr uint32_t default_stack_size = 4096;
 
 		TaskHandle_t handle_ = nullptr;
 		const uint32_t priority_;

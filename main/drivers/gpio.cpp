@@ -27,7 +27,7 @@ bool GpioDriver::initInput()
 {
     uint64_t input_mask {0};
     for (int i=0; i < GpioDriver::total_gpio; i++){
-        input_mask |= ( 1ULL << inputs_[i]);
+        input_mask |= ( 1ULL << inputs_[i].first);
     }
 
     gpio_config_t config = {};
@@ -43,12 +43,11 @@ bool GpioDriver::initInput()
     }
 
     ESP_LOGI(TAG, "Input config set.");
-
-    gpio_install_isr_service(0);
-    for (int i=0; i < GpioDriver::total_gpio; i++){
-        gpio_isr_handler_add(inputs_[i], gpio_interrupt_handler, (void *)i);
-    }
-    ESP_LOGI(TAG, "ISR configured.");
+    // gpio_install_isr_service(0);
+    // for (int i=0; i < GpioDriver::total_gpio; i++){
+    //     gpio_isr_handler_add(inputs_[i].first, gpio_interrupt_handler, (void *)i);
+    // }
+    // ESP_LOGI(TAG, "ISR configured.");
     return true;
 }
 
@@ -129,6 +128,44 @@ bool GpioDriver::changeOutput(const uint8_t id)
         .flags = {0}
     };
     return ledc_channel_config(&ledc_channel) == ESP_OK;
+}
+
+void GpioDriver::inputCheck()
+{
+    if (!checking_input_)
+    {
+        return;
+    }
+    for (auto &check : inputs_)
+    {
+        // Shift the measurements with 1 bit
+        check.second = (check.second << 1);
+        // Readout the pin and add it to bit 1
+        check.second |= gpio_get_level(check.first);;
+        /* If the 5 lowest bits so last 5 measurements are 0
+           and value is bigger than 31 then transition to low happened */
+        if (check.second > 31 && (check.second & 0x1F) == 0)
+        {
+            check.second = 0;
+            cb_state_change_(check.first, false);
+        }
+        /* When value is bigger then it means high transition happened*/
+        else if (check.second == 31)
+        {
+            cb_state_change_(check.first, true);
+        }
+    }
+}
+
+void GpioDriver::enableInputCheck(StateChangeCb cb_state_change)
+{
+    cb_state_change_ = cb_state_change;
+    checking_input_ = true;
+}
+
+bool GpioDriver::getLevel(uint8_t id)
+{
+    return gpio_get_level(inputs_[id].first) == 1;
 }
 
 static void IRAM_ATTR gpio_interrupt_handler(void *args)

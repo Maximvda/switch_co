@@ -9,7 +9,7 @@ const static char* TAG = "can thread";
 
 void CanTask::onStart()
 {
-    ESP_LOGI(TAG, "CAN thread started!!");
+    ESP_LOGI(TAG, "started.");
 	can_driver_.init();
 }
 

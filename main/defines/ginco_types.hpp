@@ -3,8 +3,6 @@
 #include <string.h>
 #include "driver/twai.h"
 
-#include "supervisor.hpp"
-
 namespace data
 {
 
@@ -18,6 +16,15 @@ namespace data
         REQUEST_STATE = 0xFF,
     };
 
+    struct OutputState
+    {
+        /* Is the output in pwm mode */
+        bool pwm_mode {false};
+        /* Is the output high or low (only valid for not pwm mode) */
+        bool high {false};
+        /* Indicate sthe pwm level */
+        uint8_t pwm_level {0};
+    };
 
     class GincoMessage
     {
@@ -68,10 +75,12 @@ namespace data
             data = message.data[0];
         };
 
-        bool acknowledge()
+        bool acknowledge();
+
+        bool acknowledge(uint8_t length, uint8_t* data)
         {
-            ack_ = true;
-            return app::taskFinder().can().transmit(getMessage());
+            memcpy(data, data, length);
+            return acknowledge();
         }
 
     };

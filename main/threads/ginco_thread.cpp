@@ -10,7 +10,7 @@ const static char* TAG = "ginco thread";
 
 void GincoTask::onStart()
 {
-    ESP_LOGI(TAG, "CAN thread started!!");
+    ESP_LOGI(TAG, "started.");
 }
 
 void GincoTask::onTimeout()

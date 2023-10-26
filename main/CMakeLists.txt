@@ -4,6 +4,7 @@ file(GLOB private_lib
     threading/*.cpp
     threads/*.cpp
     app/*.cpp
+    defines/*.cpp
 )
 
 idf_component_register(

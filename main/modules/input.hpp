@@ -1,26 +1,35 @@
 #pragma once
 
 #include "esp_timer.h"
+#include "ginco_types.hpp"
 
-class Input {
+using data::GincoMessage;
+
+namespace modules
+{
+
+    class Input {
     private:
-        uint8_t id {0};
-        bool button {false};
-        bool state {false};
-        esp_timer_handle_t press_timer;
-        esp_timer_handle_t hold_timer;
-        volatile uint8_t current_press {0};
-        volatile bool hold_active {false};
+        bool button_ {false};
+        bool state_ {false};
+        esp_timer_handle_t press_timer_;
+        esp_timer_handle_t hold_timer_;
+        bool hold_active_ {false};
+        uint8_t current_press_ {0};
 
     public:
-        Input();
-        explicit Input(uint8_t id, void (*_callback)(void* arg), void (*_hold_callback)(void* arg));
+        uint8_t id {0};
+        Input(){};
+        Input(uint8_t id, bool button);
+        void createTimers();
 
-        // void handle_message(driver::can::message_t can_mes);
+        void handleMessage(GincoMessage& message);
 
         void heartbeat();
-        void toggle();
+        void onToggle();
         void set_button(bool value);
-        void press_callback();
-        void hold_callback();
+        void holdCallback();
+        void pressCallback();
 };
+
+} // namespace modules
