@@ -17,11 +17,14 @@ namespace modules
         bool hold_active_ {false};
         uint8_t current_press_ {0};
 
+        uint64_t last_press_time_ {0};
+        uint64_t hold_time_ {0};
+
     public:
         uint8_t id {0};
         Input(){};
         Input(uint8_t id, bool button);
-        void createTimers();
+        void tick();
 
         void handleMessage(GincoMessage& message);
 

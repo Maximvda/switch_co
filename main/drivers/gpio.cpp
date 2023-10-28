@@ -9,7 +9,6 @@
 
 using driver::GpioDriver;
 const static char* TAG = "gpio driver";
-static void IRAM_ATTR gpio_interrupt_handler(void *args);
 
 bool GpioDriver::init()
 {
@@ -41,15 +40,8 @@ bool GpioDriver::initInput()
         ESP_LOGE(TAG, "Failed to set input config");
         return false;
     }
-
     ESP_LOGI(TAG, "Input config set.");
-    gpio_install_isr_service(0);
     return true;
-}
-
-void GpioDriver::registerInterrupt(uint8_t id, void* arg)
-{
-    gpio_isr_handler_add(inputs_[id].first, &gpio_interrupt_handler, arg);
 }
 
 bool GpioDriver::initOutput()
@@ -137,8 +129,9 @@ void GpioDriver::inputCheck()
     {
         return;
     }
-    for (auto &check : inputs_)
+    for (uint8_t i=0; i < GpioDriver::TOTAL_GPIO; i++)
     {
+        auto& check = inputs_[i];
         // Shift the measurements with 1 bit
         check.second = (check.second << 1);
         // Readout the pin and add it to bit 1
@@ -148,12 +141,14 @@ void GpioDriver::inputCheck()
         if (check.second > 31 && (check.second & 0x1F) == 0)
         {
             check.second = 0;
-            cb_state_change_(check.first, false);
+            ESP_LOGI(TAG, "State changed doing cb");
+            cb_state_change_(i, false);
         }
         /* When value is bigger then it means high transition happened*/
         else if (check.second == 31)
         {
-            cb_state_change_(check.first, true);
+            ESP_LOGI(TAG, "State changed doing cb");
+            cb_state_change_(i, true);
         }
     }
 }
@@ -167,9 +162,4 @@ void GpioDriver::enableInputCheck(StateChangeCb cb_state_change)
 bool GpioDriver::getLevel(uint8_t id)
 {
     return gpio_get_level(inputs_[id].first) == 1;
-}
-
-static void IRAM_ATTR gpio_interrupt_handler(void *args)
-{
-    app::taskFinder().gpio().irGpioToggle(args);
 }

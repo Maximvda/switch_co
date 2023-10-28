@@ -26,14 +26,9 @@ namespace app {
 
 		const char * name() const override { return "Gpio"; }
 
-		bool isrGpioToggle(uint32_t pin_id)
+		bool gpioToggle(uint8_t id, bool state)
 		{
-			return postFromISR(EVENT_GPIO_TOGGLE, pin_id);
-		}
-
-		bool irGpioToggle(void* ptr)
-		{
-			return postFromISR(EVENT_GPIO_TOGGLE, static_cast<Input*>(ptr));
+			return post(EVENT_GPIO_TOGGLE, std::make_unique<std::pair<uint8_t, bool>>(std::make_pair(id, state)));
 		}
 
 	};
