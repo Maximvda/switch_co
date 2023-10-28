@@ -20,14 +20,6 @@ void GincoTask::onTimeout()
 void GincoTask::handle(Message& message)
 {
 	switch (message.event()) {
-	case EVENT_CAN_RECEIVED:
-	{
-		if (auto mes = message.takeValue<twai_message_t>())
-		{
-			/*TODO: Handle can frame */
-		}
-		break;
-	}
 	default:
 		assert(0);
 	}

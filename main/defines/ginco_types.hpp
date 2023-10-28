@@ -13,6 +13,8 @@ namespace data
         TOGGLE,
         EFFECT,
         PAUSE_EFFECT,
+        UPGRADE,
+        FW_IMAGE,
         REQUEST_STATE = 0xFF,
     };
 

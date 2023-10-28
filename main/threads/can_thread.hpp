@@ -3,12 +3,14 @@
 #include "standard_task.hpp"
 
 #include "can.hpp"
+#include "upgrade.hpp"
 #include "concurrent.hpp"
 #include "events.h"
 
 using utils::StandardTask;
 using utils::Milliseconds;
 using driver::can::CanDriver;
+using driver::UpgradeHandler;
 
 namespace app {
 
@@ -21,6 +23,7 @@ namespace app {
        	Milliseconds queueTimeout() override { return 10; };
 
 		CanDriver can_driver_;
+		UpgradeHandler upgrade_handler_;
 
 	public:
 

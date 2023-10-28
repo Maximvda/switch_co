@@ -47,7 +47,7 @@ void CanDriver::tick()
         return;
     }
     /* Frame received so send to correct place */
-    app::taskFinder().ginco().frameReady(message);
+    app::taskFinder().can().frameReady(message);
 }
 
 bool CanDriver::transmit(const twai_message_t& can_mes){

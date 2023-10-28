@@ -1,12 +1,13 @@
 #pragma once
 
 #include "standard_task.hpp"
+#include "ginco_types.hpp"
 #include  "concurrent.hpp"
 #include "events.h"
-#include "driver/twai.h"
 
 using utils::StandardTask;
 using utils::Milliseconds;
+using data::GincoMessage;
 
 namespace app {
 
@@ -24,9 +25,9 @@ namespace app {
 
 		const char * name() const override { return "ginco"; }
 
-		bool frameReady(twai_message_t& message)
+		bool frameReady(GincoMessage& message)
 		{
-			return post(EVENT_CAN_RECEIVED, std::make_unique<twai_message_t>(message));
+			return post(EVENT_CAN_RECEIVED, std::make_unique<GincoMessage>(message));
 		}
 
 	};
