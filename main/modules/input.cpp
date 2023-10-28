@@ -8,6 +8,9 @@
 //#define PERIODIC_DELAY 0.01*1000*1000
 #define PERIODIC_DELAY 0.4*1000*1000
 
+static void staticHoldCallback(void* arg);
+static void staticPressCallback(void* arg);
+
 const static char* TAG = {"input"};
 
 using modules::Input;
@@ -19,25 +22,25 @@ Input::Input(uint8_t new_id, bool button)
     button_ = button;
 }
 
-void Input::tick()
+void Input::createTimers()
 {
-    if (current_press_ == 0)
-        return;
-    uint64_t current_time = esp_timer_get_time();
-    ESP_LOGI(TAG, "%u: Current press %u , time %llu last time %llu and state %i", id, current_press_, current_time, last_press_time_, state_);
-    /* When button is unpressed and hsa been long since previous press*/
-    if (((current_time - last_press_time_) > PRESS_DELAY) ) //&& !state_)
-    {
-        pressCallback();
-        return;
-    }
-
-    /* Check if hold callback is required */
-    if ((current_time - hold_time_) > PERIODIC_DELAY)
-    {
-        hold_time_ = current_time;
-        holdCallback();
-    }
+    // Creating the timers
+    const esp_timer_create_args_t timer_args = {
+        staticPressCallback,
+        this,
+        ESP_TIMER_TASK,
+        nullptr,
+        true
+    };
+    esp_timer_create(&timer_args, &press_timer_);
+    const esp_timer_create_args_t periodic_timer_args = {
+        staticHoldCallback,
+        this,
+        ESP_TIMER_TASK,
+        nullptr,
+        true
+    };
+    esp_timer_create(&periodic_timer_args, &hold_timer_);
 }
 
 void Input::handleMessage(GincoMessage& message)
@@ -78,14 +81,29 @@ void Input::holdCallback()
 }
 
 void Input::onToggle(bool state){
-    ESP_LOGI(TAG, "%u: toggle %u", id, current_press_);
+    ESP_LOGI(TAG, "Toggling input %u, with value %u", id, current_press_);
     current_press_++;
     if(!button_){
         //TODO: What should happen in this case?!
         return;
     }
-    state_ = state;
-    last_press_time_ = esp_timer_get_time();
+    // Timer already active so we are handling second or third press
+    if (esp_timer_is_active(press_timer_) and current_press_ % 2 == 0 ){
+        esp_timer_stop(press_timer_);
+    }
+
+    // Start timers when button switch
+    esp_timer_start_once(press_timer_, PRESS_DELAY);
+    // Only start hold timer when current press is 0 (first press)
+    if (current_press_ == 1 and !hold_active_){
+        hold_active_ = true;
+        esp_timer_start_periodic(hold_timer_, PERIODIC_DELAY);
+    }
+    // Hold timer active so we held button and stop now -> stop timer
+    else if (esp_timer_is_active(hold_timer_)){
+        esp_timer_stop(hold_timer_);
+        hold_active_ = false;
+    }
 }
 
 // void Input::heartbeat(){
@@ -97,3 +115,23 @@ void Input::onToggle(bool state){
 //     sprintf(config_key, "input%i", id);
 //     config::set_key(config_key, value ? 1 : 0);
 // }
+
+static void staticHoldCallback(void* arg)
+{
+    if (arg != nullptr)
+    {
+        Input* input = reinterpret_cast<Input*>(arg);
+        input->holdCallback();
+    }
+}
+static void staticPressCallback(void* arg)
+{
+    if (arg != nullptr)
+    {
+        // int id = *(int*) arg;
+        // app::taskFinder().gpio().gpio_handler.onPress(id);
+        Input* input = static_cast<Input*>(arg);
+        // ESP_LOGI(TAG, "Input %us with tgl %us", input.id, input.current_press_);
+        input->pressCallback();
+    }
+}

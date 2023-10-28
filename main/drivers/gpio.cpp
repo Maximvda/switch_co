@@ -141,13 +141,11 @@ void GpioDriver::inputCheck()
         if (check.second > 31 && (check.second & 0x1F) == 0)
         {
             check.second = 0;
-            ESP_LOGI(TAG, "State changed doing cb");
             cb_state_change_(i, false);
         }
         /* When value is bigger then it means high transition happened*/
         else if (check.second == 31)
         {
-            ESP_LOGI(TAG, "State changed doing cb");
             cb_state_change_(i, true);
         }
     }

@@ -16,10 +16,6 @@ void GpioTask::onStart()
 void GpioTask::onTimeout()
 {
 	gpio_handler.gpio_driver_.inputCheck();
-
-	for(uint8_t i=0; i < driver::GpioDriver::TOTAL_GPIO; i++){
-		gpio_handler.inputs_[i].tick();
-    }
 }
 
 void GpioTask::handle(Message& message)

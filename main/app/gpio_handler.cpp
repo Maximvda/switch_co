@@ -10,6 +10,7 @@ void GpioHandler::init()
         OutputState state;
         // inputs_[i] = Input(i, true);
         outputs_[i] = Output(i);
+        inputs_[i].createTimers();
     }
     gpio_driver_.init();
     gpio_driver_.enableInputCheck(
