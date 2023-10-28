@@ -21,14 +21,6 @@ void GpioTask::onTimeout()
 void GpioTask::handle(Message& message)
 {
 	switch (message.event()) {
-	case EVENT_GPIO_TOGGLE:
-	{
-		if (auto value = message.takeValue<std::pair<uint8_t, bool>>())
-		{
-			gpio_handler.cbGpioChanged(value.get()->first, value.get()->second);
-		}
-		break;
-	}
 	default:
 		assert(0);
 	}

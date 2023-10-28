@@ -2,8 +2,6 @@
 
 #include "esp_log.h"
 
-#include "supervisor.hpp"
-
 #define PRESS_DELAY 0.4*1000*1000
 //#define PERIODIC_DELAY 0.01*1000*1000
 #define PERIODIC_DELAY 0.4*1000*1000
@@ -128,10 +126,7 @@ static void staticPressCallback(void* arg)
 {
     if (arg != nullptr)
     {
-        // int id = *(int*) arg;
-        // app::taskFinder().gpio().gpio_handler.onPress(id);
-        Input* input = static_cast<Input*>(arg);
-        // ESP_LOGI(TAG, "Input %us with tgl %us", input.id, input.current_press_);
+        Input* input = reinterpret_cast<Input*>(arg);
         input->pressCallback();
     }
 }

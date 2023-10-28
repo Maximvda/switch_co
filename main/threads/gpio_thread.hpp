@@ -26,11 +26,6 @@ namespace app {
 
 		const char * name() const override { return "Gpio"; }
 
-		bool gpioToggle(uint8_t id, bool state)
-		{
-			return post(EVENT_GPIO_TOGGLE, std::make_unique<std::pair<uint8_t, bool>>(std::make_pair(id, state)));
-		}
-
 	};
 
 }
