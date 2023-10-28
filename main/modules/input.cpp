@@ -80,7 +80,7 @@ void Input::holdCallback()
     ESP_LOGI(TAG, "Hold callback %u", this->id);
 }
 
-void Input::onToggle(){
+void Input::onToggle(bool state){
     ESP_LOGI(TAG, "Toggling input %us, with value %us", id, current_press_);
     current_press_++;
     if(!button_){

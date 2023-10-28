@@ -31,6 +31,11 @@ namespace app {
 			return postFromISR(EVENT_GPIO_TOGGLE, pin_id);
 		}
 
+		bool irGpioToggle(void* ptr)
+		{
+			return postFromISR(EVENT_GPIO_TOGGLE, static_cast<Input*>(ptr));
+		}
+
 	};
 
 }

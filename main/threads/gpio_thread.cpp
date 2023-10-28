@@ -15,7 +15,7 @@ void GpioTask::onStart()
 
 void GpioTask::onTimeout()
 {
-	gpio_handler.gpio_driver_.inputCheck();
+	// gpio_handler.gpio_driver_.inputCheck();
 }
 
 void GpioTask::handle(Message& message)
@@ -23,8 +23,10 @@ void GpioTask::handle(Message& message)
 	switch (message.event()) {
 	case EVENT_GPIO_TOGGLE:
 	{
-		ESP_LOGI(TAG, "GPIO pin: %lu", message.uint32Value());
-		gpio_handler.inputs_[message.uint32Value()].onToggle();
+		// ESP_LOGI(TAG, "GPIO pin: %lu", message.uint32Value());
+		// gpio_handler.inputs_[message.uint32Value()].onToggle();
+		Input* instance = message.pointerValue<Input>();
+		instance->onToggle(true);
 		break;
 	}
 	default:

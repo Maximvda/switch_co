@@ -19,12 +19,12 @@ namespace driver {
     class GpioDriver
     {
     public:
-        static constexpr uint8_t total_gpio {7};
+        static constexpr uint8_t TOTAL_GPIO {7};
 
     private:
         using StateChangeCb = std::function<void(uint8_t, bool)>;
-        gpio_num_t outputs_[total_gpio] {GPIO_NUM_23,GPIO_NUM_25,GPIO_NUM_14,GPIO_NUM_12,GPIO_NUM_19,GPIO_NUM_18,GPIO_NUM_17};
-        std::pair<gpio_num_t, uint32_t> inputs_[total_gpio] {
+        gpio_num_t outputs_[TOTAL_GPIO] {GPIO_NUM_23,GPIO_NUM_25,GPIO_NUM_14,GPIO_NUM_12,GPIO_NUM_19,GPIO_NUM_18,GPIO_NUM_17};
+        std::pair<gpio_num_t, uint32_t> inputs_[TOTAL_GPIO] {
             std::make_pair(GPIO_NUM_15, 0),
             std::make_pair(GPIO_NUM_33, 0),
             std::make_pair(GPIO_NUM_26, 0),
@@ -35,7 +35,7 @@ namespace driver {
         };
 
         /* Remember in which state the output is. PWM or GPIO */
-        OutputState output_states_[total_gpio] {};
+        OutputState output_states_[TOTAL_GPIO] {};
 
         bool checking_input_ {false};
         /**
@@ -62,6 +62,8 @@ namespace driver {
         bool setOutput(uint8_t id, std::variant<bool, uint8_t> value);
         void inputCheck();
         bool getLevel(uint8_t id);
+
+        void registerInterrupt(uint8_t id, void* arg);
     };
 
 }

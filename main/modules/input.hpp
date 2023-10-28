@@ -26,7 +26,7 @@ namespace modules
         void handleMessage(GincoMessage& message);
 
         void heartbeat();
-        void onToggle();
+        void onToggle(bool state);
         void set_button(bool value);
         void holdCallback();
         void pressCallback();

@@ -18,14 +18,14 @@ namespace app
     {
     private:
 		GpioDriver gpio_driver_;
-		Output outputs_[GpioDriver::total_gpio];
-		Input inputs_[GpioDriver::total_gpio];
+		Output outputs_[GpioDriver::TOTAL_GPIO];
+		Input inputs_[GpioDriver::TOTAL_GPIO];
 
     public:
         void init();
         friend class GpioTask;
 
-        void onPress(uint8_t id);
+        void cbGpioChanged(uint8_t id, bool value);
 
     };
 } // namespace app

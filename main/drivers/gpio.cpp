@@ -26,7 +26,7 @@ bool GpioDriver::init()
 bool GpioDriver::initInput()
 {
     uint64_t input_mask {0};
-    for (int i=0; i < GpioDriver::total_gpio; i++){
+    for (int i=0; i < GpioDriver::TOTAL_GPIO; i++){
         input_mask |= ( 1ULL << inputs_[i].first);
     }
 
@@ -43,18 +43,19 @@ bool GpioDriver::initInput()
     }
 
     ESP_LOGI(TAG, "Input config set.");
-    // gpio_install_isr_service(0);
-    // for (int i=0; i < GpioDriver::total_gpio; i++){
-    //     gpio_isr_handler_add(inputs_[i].first, gpio_interrupt_handler, (void *)i);
-    // }
-    // ESP_LOGI(TAG, "ISR configured.");
+    gpio_install_isr_service(0);
     return true;
+}
+
+void GpioDriver::registerInterrupt(uint8_t id, void* arg)
+{
+    gpio_isr_handler_add(inputs_[id].first, &gpio_interrupt_handler, arg);
 }
 
 bool GpioDriver::initOutput()
 {
     uint32_t output_mask {0};
-    for (int i=0; i < GpioDriver::total_gpio; i++){
+    for (int i=0; i < GpioDriver::TOTAL_GPIO; i++){
         output_mask |= (1ULL << outputs_[i]);
     }
     gpio_config_t config;
@@ -170,5 +171,5 @@ bool GpioDriver::getLevel(uint8_t id)
 
 static void IRAM_ATTR gpio_interrupt_handler(void *args)
 {
-    app::taskFinder().gpio().isrGpioToggle((uint32_t)args);
+    app::taskFinder().gpio().irGpioToggle(args);
 }
