@@ -25,7 +25,7 @@ namespace app {
 
 		const char * name() const override { return "ginco"; }
 
-		bool frameReady(GincoMessage& message)
+		bool frameReady(const GincoMessage& message)
 		{
 			return post(EVENT_CAN_RECEIVED, std::make_unique<GincoMessage>(message));
 		}

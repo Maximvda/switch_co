@@ -31,9 +31,14 @@ namespace app {
 
 		const char * name() const override { return "Can"; }
 
-		bool transmit(twai_message_t message)
+		bool transmit(GincoMessage& message)
 		{
-			return post(EVENT_CAN_TRANSMIT, std::make_unique<twai_message_t>(message));
+			return post(EVENT_CAN_TRANSMIT, std::make_unique<twai_message_t>(message.getMessage()));
+		}
+
+		bool frameReady(const twai_message_t& message)
+		{
+			return post(EVENT_CAN_RECEIVED, std::make_unique<GincoMessage>(GincoMessage(message)));
 		}
 
 	};

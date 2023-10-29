@@ -5,6 +5,7 @@
 // #include "mqtt_client.h"
 // #include "esp_ota_ops.h"
 #include "ginco_types.hpp"
+#include "esp_ota_ops.h"
 
 using data::GincoMessage;
 
@@ -18,19 +19,12 @@ namespace driver
 	        esp_ota_handle_t update_handle_;
             uint64_t image_size_;
 
-            void end();
+            void complete();
+            bool partitionValid();
         public:
-            void init(const GincoMessage& message);
-            void handle(const GincoMessage& message);
+            bool init(const GincoMessage& message);
+            bool handle(const GincoMessage& message);
+            void fail();
     };
 
 } // namespace driver
-
-// class Receiver {
-// public:
-// 	virtual bool init(Ginco__Command* command) = 0;
-// 	virtual bool receive(const uint8_t * data, uint32_t len) = 0;
-// 	virtual void complete() = 0;
-// 	virtual void fail() = 0;
-// 	virtual ~Receiver() {};
-// };

@@ -7,5 +7,5 @@ using data::GincoMessage;
 bool GincoMessage::acknowledge()
 {
     ack_ = true;
-    return app::taskFinder().can().transmit(getMessage());
+    return app::taskFinder().can().transmit(*this);
 }

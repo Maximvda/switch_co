@@ -27,21 +27,23 @@ void CanTask::handle(Message& message)
 	switch (message.event()) {
 	case EVENT_CAN_RECEIVED:
 	{
-		if (auto mes = message.takeValue<twai_message_t>())
+		if (auto mes = message.takeValue<GincoMessage>())
 		{
 			/*TODO: Handle can frame */
-			auto message = GincoMessage(mes.get());
-			if (message.function == Function::UPGRADE)
+			/*TODO: CHECK IF FRAME IS FOR THIS DEVICE OR DIFFERENT DEVICE */
+			auto message = mes.get();
+			message.id
+			if (message->function == Function::UPGRADE)
 			{
-				upgrade_handler_.init(message);
+				upgrade_handler_.init(*message);
 				return;
 			}
-			if (message.function == Function::FW_IMAGE)
+			if (message->function == Function::FW_IMAGE)
 			{
-				upgrade_handler_.handle(message);
-				return
+				upgrade_handler_.handle(*message);
+				return;
 			}
-			app::taskFinder().ginco().
+			app::taskFinder().ginco().frameReady(*message);
 		}
 		break;
 	}

@@ -37,7 +37,6 @@ namespace data
         bool ack_;
         uint8_t feature_type_;
         uint8_t index_;
-        uint8_t data_length_;
 
         uint32_t getId()
         {
@@ -52,19 +51,10 @@ namespace data
             );
         };
 
-        twai_message_t getMessage()
-        {
-            twai_message_t message;
-            message.identifier = getId();
-            message.extd = 1;
-            message.data_length_code = data_length_;
-            memcpy(message.data, &data, data_length_);
-            return message;
-        };
-
     public:
         Function function;
         uint64_t data;
+        uint8_t data_length;
 
         GincoMessage(twai_message_t message) {
             source_id_ = (message.identifier >> 18) & 0xFF;
@@ -73,8 +63,18 @@ namespace data
             feature_type_ = (message.identifier >> 13) & 0x07;
             index_ = (message.identifier >> 8) & 0x1F;
             function = static_cast<Function>(message.identifier & 0xFF);
-            data_length_ = message.data_length_code;
+            data_length = message.data_length_code;
             data = message.data[0];
+        };
+
+        twai_message_t getMessage()
+        {
+            twai_message_t message;
+            message.identifier = getId();
+            message.extd = 1;
+            message.data_length_code = data_length;
+            memcpy(message.data, &data, data_length);
+            return message;
         };
 
         bool acknowledge();
