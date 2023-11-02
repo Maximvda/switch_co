@@ -32,7 +32,6 @@ void CanTask::handle(Message& message)
             /*TODO: Handle can frame */
             /*TODO: CHECK IF FRAME IS FOR THIS DEVICE OR DIFFERENT DEVICE */
             auto message = mes.get();
-            message.id
             if (message->function == Function::UPGRADE)
             {
                 upgrade_handler_.init(*message);

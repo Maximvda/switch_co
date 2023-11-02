@@ -15,6 +15,7 @@ namespace data
         PAUSE_EFFECT,
         UPGRADE,
         FW_IMAGE,
+        REQUEST_ADDRESS,
         REQUEST_STATE = 0xFF,
     };
 
@@ -31,33 +32,34 @@ namespace data
     class GincoMessage
     {
     private:
-        uint8_t source_id_;
         bool event_ {false};
-        bool linked_;
-        bool ack_;
-        uint8_t feature_type_;
-        uint8_t index_;
+        bool linked_ {false};
+        bool ack_ {false};
+        uint8_t feature_type_ {0};
+        uint8_t index_ {0};
+        twai_message_t can_message_;
 
-        uint32_t getId()
+        uint32_t id() const
         {
             return (
                 (event_ ? 1 << 26 : 0) +
-                (source_id_ << 18) +
+                (source_id << 18) +
                 (linked_ ? 1 << 17 : 0) +
                 (ack_ ? 1 << 16 : 0) +
                 (feature_type_ << 13) +
                 (index_ << 8) +
-                static_cast<uint8_t>(function)
-            );
-        };
+                static_cast<uint8_t>(function));
+        }
 
     public:
+        uint8_t source_id {0};
         Function function;
         uint64_t data;
-        uint8_t data_length;
+        uint8_t data_length {0};
+        GincoMessage(){};
 
         GincoMessage(twai_message_t message) {
-            source_id_ = (message.identifier >> 18) & 0xFF;
+            source_id = (message.identifier >> 18) & 0xFF;
             linked_ = (message.identifier >> 17) & 0x01;
             ack_ = (message.identifier >> 16) & 0x01;
             feature_type_ = (message.identifier >> 13) & 0x07;
@@ -67,17 +69,32 @@ namespace data
             data = message.data[0];
         };
 
-        twai_message_t getMessage()
+        twai_message_t& canMessage()
         {
-            twai_message_t message;
-            message.identifier = getId();
-            message.extd = 1;
-            message.data_length_code = data_length;
-            memcpy(message.data, &data, data_length);
-            return message;
-        };
+            can_message_.identifier = id();
+            can_message_.extd = 1;
+            can_message_.data_length_code = data_length;
+            memcpy(can_message_.data, &data, data_length);
+            return can_message_;
+        }
+
+        bool operator==(GincoMessage &lhs)
+        {
+            return lhs.id() == id();
+        }
 
         bool acknowledge();
+
+        bool isAcknowledge(GincoMessage &other)
+        {
+            // invert the other message and compare id
+            other.ack_ = !other.ack_;
+            bool resp = other == *this;
+            other.ack_ = !other.ack_;
+            return resp;
+        }
+
+        bool send();
 
         bool acknowledge(uint8_t length, uint8_t* data)
         {

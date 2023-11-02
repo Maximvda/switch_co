@@ -1,13 +1,17 @@
 #include "device.hpp"
 
+#include "can.hpp"
+
 using app::Device;
+using data::Function;
 
 static const char* TAG = {"Device"};
 
 void Device::init()
 {
-    config_driver_.init();
-    id_ = config_driver_.deviceId();
+    GincoMessage message;
+    message.function = Function::REQUEST_ADDRESS;
+    message.send();
 }
 
 void Device::handleMessage(GincoMessage& message)

@@ -2,6 +2,9 @@
 
 #include "esp_log.h"
 #include "can.hpp"
+#include "esp_timer.h"
+
+#include "supervisor.hpp"
 
 using app::GincoTask;
 using utils::Message;
@@ -15,6 +18,7 @@ void GincoTask::onStart()
 
 void GincoTask::onTimeout()
 {
+    ginco_dev_.init();
 }
 
 void GincoTask::handle(Message& message)

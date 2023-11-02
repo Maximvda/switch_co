@@ -9,3 +9,8 @@ bool GincoMessage::acknowledge()
     ack_ = true;
     return app::taskFinder().can().transmit(*this);
 }
+
+bool GincoMessage::send()
+{
+    return app::taskFinder().can().transmit(*this);
+}

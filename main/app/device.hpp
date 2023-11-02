@@ -11,8 +11,6 @@ namespace app
         private:
             uint8_t id_ {0};
 
-            driver::ConfigDriver config_driver_;
-
         public:
             void init();
             void handleMessage(GincoMessage& message);

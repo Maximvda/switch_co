@@ -33,10 +33,10 @@ namespace app {
 
         bool transmit(GincoMessage& message)
         {
-            return post(EVENT_CAN_TRANSMIT, std::make_unique<twai_message_t>(message.getMessage()));
+            return post(EVENT_CAN_TRANSMIT, std::make_unique<twai_message_t>(message.canMessage()));
         }
 
-        bool frameReady(const twai_message_t& message)
+        bool frameReady(const twai_message_t message)
         {
             return post(EVENT_CAN_RECEIVED, std::make_unique<GincoMessage>(GincoMessage(message)));
         }
