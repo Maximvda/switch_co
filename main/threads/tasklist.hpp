@@ -9,29 +9,29 @@ using utils::SupervisedTask;
 
 namespace app {
 
-	class TaskList {
-	private:
+    class TaskList {
+    private:
         app::CanTask can_ {3};
-		app::GpioTask gpio_ {2};
-		app::GincoTask ginco_ {1};
+        app::GpioTask gpio_ {2};
+        app::GincoTask ginco_ {1};
 
-		const std::vector<SupervisedTask *> tasks_ {
-			&can_,
-			&gpio_,
-			&ginco_
-		};
+        const std::vector<SupervisedTask *> tasks_ {
+            &can_,
+            &gpio_,
+            &ginco_
+        };
 
-		TaskList() = default;
+        TaskList() = default;
 
-	public:
-		// only Supervisor can create the TaskList
-		friend class Supervisor;
+    public:
+        // only Supervisor can create the TaskList
+        friend class Supervisor;
 
-		TaskList(const TaskList&) = delete;
-		auto& tasks() { return tasks_; }
+        TaskList(const TaskList&) = delete;
+        auto& tasks() { return tasks_; }
 
-		auto& can() { return can_;}
-		auto& gpio() { return gpio_;}
-		auto& ginco() { return ginco_;}
-	};
+        auto& can() { return can_;}
+        auto& gpio() { return gpio_;}
+        auto& ginco() { return ginco_;}
+    };
 }

@@ -17,9 +17,9 @@ namespace app
     class GpioHandler
     {
     private:
-		GpioDriver gpio_driver_;
-		Output outputs_[GpioDriver::TOTAL_GPIO];
-		Input inputs_[GpioDriver::TOTAL_GPIO] =
+        GpioDriver gpio_driver_;
+        Output outputs_[GpioDriver::TOTAL_GPIO];
+        Input inputs_[GpioDriver::TOTAL_GPIO] =
     {
       Input(0, true),
       Input(1, true),

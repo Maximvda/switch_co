@@ -10,19 +10,19 @@ const static char* TAG = "gpio thread";
 void GpioTask::onStart()
 {
     ESP_LOGI(TAG, "started.");
-	gpio_handler.init();
+    gpio_handler.init();
 }
 
 void GpioTask::onTimeout()
 {
-	gpio_handler.gpio_driver_.inputCheck();
+    gpio_handler.gpio_driver_.inputCheck();
 }
 
 void GpioTask::handle(Message& message)
 {
-	switch (message.event()) {
-	default:
-		assert(0);
-	}
+    switch (message.event()) {
+    default:
+        assert(0);
+    }
 
 }

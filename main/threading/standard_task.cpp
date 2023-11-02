@@ -40,7 +40,7 @@ void StandardTask::run()
     uint32_t last_alive_sent = 0;
 
     for (;;) {
-    	if (auto maybe_message = queue_.tryPop(queueTimeout())) {
+        if (auto maybe_message = queue_.tryPop(queueTimeout())) {
             process(*maybe_message);
             // test if heap pointer has been taken
             assert(!maybe_message->hasUniquePointer());
@@ -51,7 +51,7 @@ void StandardTask::run()
         TickType_t now = xTaskGetTickCount();
         if((now - last_alive_sent) >= aliveTimeout) {
             if (sendAlive()) {
-            	last_alive_sent = xTaskGetTickCount();
+                last_alive_sent = xTaskGetTickCount();
             }
         }
         tick();

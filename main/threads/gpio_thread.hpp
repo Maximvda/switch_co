@@ -11,21 +11,21 @@ using app::GpioHandler;
 
 namespace app {
 
-	class GpioTask : public StandardTask {
+    class GpioTask : public StandardTask {
 
-	private:
-		void handle(utils::Message&) override;
-		void onStart() override;
-		void onTimeout() override;
-       	Milliseconds queueTimeout() override { return 10;};
+    private:
+        void handle(utils::Message&) override;
+        void onStart() override;
+        void onTimeout() override;
+           Milliseconds queueTimeout() override { return 10;};
 
-	public:
-		GpioHandler gpio_handler;
+    public:
+        GpioHandler gpio_handler;
 
-		GpioTask(uint32_t priority) : StandardTask(priority) {}
+        GpioTask(uint32_t priority) : StandardTask(priority) {}
 
-		const char * name() const override { return "Gpio"; }
+        const char * name() const override { return "Gpio"; }
 
-	};
+    };
 
 }

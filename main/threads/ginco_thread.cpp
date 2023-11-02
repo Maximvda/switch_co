@@ -19,9 +19,9 @@ void GincoTask::onTimeout()
 
 void GincoTask::handle(Message& message)
 {
-	switch (message.event()) {
-	default:
-		assert(0);
-	}
+    switch (message.event()) {
+    default:
+        assert(0);
+    }
 
 }
