@@ -51,9 +51,9 @@ namespace app {
 
             if (xTaskGetTickCount() - last_tick < max_ticks) {
 
-                }
+            }
             else {
-                assert(0);
+                // assert(0);
             }
         }
     }

@@ -21,16 +21,26 @@ bool UpgradeHandler::init(const GincoMessage& message)
     }
 
     ESP_ERROR_CHECK(esp_ota_begin(ota_partition_, image_size_, &update_handle_));
-    ESP_LOGI(TAG, "esp_ota_begin succeeded");
+    ESP_LOGI(TAG, "ota begin ok: size %llu", image_size_);
     return true;
 };
 
 bool UpgradeHandler::handle(const GincoMessage& message)
 {
+    mes_received_++;
     image_size_ -=  message.data_length;
+    if ((mes_received_ % 1000) == 0)
+    {
+        ESP_LOGI(TAG, "prog %lu | %llu", mes_received_, image_size_);
+    }
+    if (image_size_ < 0)
+    {
+        ESP_LOGI(TAG, "Final message %lu | %llu | size %u", mes_received_, image_size_, message.data_length);
+    }
     ESP_ERROR_CHECK(esp_ota_write(update_handle_, &message.data, message.data_length));
     if (image_size_ == 0)
     {
+        ESP_LOGI(TAG, "Transfer complete");
         complete();
     }
     return true;

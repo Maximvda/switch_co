@@ -9,9 +9,7 @@ static const char* TAG = {"Device"};
 
 void Device::init()
 {
-    GincoMessage message;
-    message.function = Function::REQUEST_ADDRESS;
-    message.send();
+
 }
 
 void Device::handleMessage(GincoMessage& message)

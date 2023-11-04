@@ -24,6 +24,15 @@ void GincoTask::onTimeout()
 void GincoTask::handle(Message& message)
 {
     switch (message.event()) {
+    case EVENT_CAN_RECEIVED:
+    {
+        /*TODO: handle can messages */
+        if (auto mes = message.takeValue<GincoMessage>())
+        {
+
+        }
+        break;
+    }
     default:
         assert(0);
     }

@@ -54,7 +54,7 @@ namespace data
     public:
         uint8_t source_id {0};
         Function function;
-        uint64_t data;
+        uint64_t data {0};
         uint8_t data_length {0};
         GincoMessage(){};
 
@@ -66,7 +66,7 @@ namespace data
             index_ = (message.identifier >> 8) & 0x1F;
             function = static_cast<Function>(message.identifier & 0xFF);
             data_length = message.data_length_code;
-            data = message.data[0];
+            memcpy(&data, message.data, message.data_length_code);
         };
 
         twai_message_t& canMessage()
@@ -83,7 +83,7 @@ namespace data
             return lhs.id() == id();
         }
 
-        bool acknowledge();
+        GincoMessage acknowledge();
 
         bool isAcknowledge(GincoMessage &other)
         {
@@ -94,14 +94,7 @@ namespace data
             return resp;
         }
 
-        bool send();
-
-        bool acknowledge(uint8_t length, uint8_t* data)
-        {
-            memcpy(data, data, length);
-            return acknowledge();
-        }
-
+        bool send(bool acknowledge=false);
     };
 
 }

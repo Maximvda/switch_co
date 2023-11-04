@@ -4,13 +4,22 @@
 
 using data::GincoMessage;
 
-bool GincoMessage::acknowledge()
+GincoMessage GincoMessage::acknowledge()
 {
-    ack_ = true;
-    return app::taskFinder().can().transmit(*this);
+    GincoMessage copy = *this;
+    copy.ack_ = true;
+    copy.data_length = 0;
+    return copy;
 }
 
-bool GincoMessage::send()
+bool GincoMessage::send(bool acknowledge)
 {
-    return app::taskFinder().can().transmit(*this);
+    bool res = app::taskFinder().can().transmit(*this);
+    if (acknowledge)
+    {
+        /* FIXME: Is not actually returning real response of the acknowledge !! */
+        /*TODO: !!*/
+        return res;
+    }
+    return res;
 }
