@@ -1,8 +1,12 @@
 #pragma once
 
-#include "stdint.h"
+/* std includes */
 #include <functional>
+
+/* Esp includes */
 #include "driver/twai.h"
+
+/* Ginco includes */
 #include "ginco_types.hpp"
 
 using data::GincoMessage;
@@ -18,7 +22,7 @@ namespace driver {
         void init(MessageCb cb_fnc);
         void tick();
 
-        bool transmit(const twai_message_t& message);
+        bool transmit(GincoMessage &message, bool blocking = false);
     };
 
 }

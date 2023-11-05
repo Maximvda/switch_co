@@ -65,6 +65,12 @@ void ConfigDriver::getString(const ConfigKey key)
     config_data_[key] = std::string(data);
 }
 
+void ConfigDriver::setString(const ConfigKey key, std::string value){
+    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
+    nvs_set_str(nvs_handle_, key_name, value.data());
+    nvs_commit(nvs_handle_);
+}
+
 void ConfigDriver::getBool(const ConfigKey key)
 {
     const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
@@ -79,8 +85,10 @@ void ConfigDriver::setUint8(const ConfigKey key, uint8_t value){
     nvs_commit(nvs_handle_);
 }
 
-void ConfigDriver::setString(const ConfigKey key, std::string value){
+void ConfigDriver::getUint8(const ConfigKey key)
+{
     const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    nvs_set_str(nvs_handle_, key_name, value.data());
-    nvs_commit(nvs_handle_);
+    uint8_t value {0};
+    nvs_get_u8(nvs_handle_, key_name, &value);
+    config_data_[key] = value;
 }

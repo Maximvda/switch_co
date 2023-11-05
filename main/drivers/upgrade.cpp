@@ -9,6 +9,10 @@ const char * TAG = "Upgrade";
 
 bool UpgradeHandler::init(const GincoMessage& message)
 {
+    if (image_size_ != 0)
+    {
+        return false;
+    }
     ota_partition_ = esp_ota_get_next_update_partition(NULL);
     if (ota_partition_ == NULL){
         ESP_LOGE(TAG, "Passive OTA partition not found");
@@ -33,26 +37,21 @@ bool UpgradeHandler::handle(const GincoMessage& message)
     {
         ESP_LOGI(TAG, "prog %lu | %llu", mes_received_, image_size_);
     }
-    if (image_size_ < 0)
-    {
-        ESP_LOGI(TAG, "Final message %lu | %llu | size %u", mes_received_, image_size_, message.data_length);
-    }
     ESP_ERROR_CHECK(esp_ota_write(update_handle_, &message.data, message.data_length));
     if (image_size_ == 0)
     {
-        ESP_LOGI(TAG, "Transfer complete");
         complete();
     }
     return true;
 };
 
 void UpgradeHandler::complete(){
+    ESP_LOGI(TAG, "Transfer complete");
     ESP_ERROR_CHECK(esp_ota_end(update_handle_));
     if (!partitionValid())
         return;
 
     ESP_ERROR_CHECK(esp_ota_set_boot_partition(ota_partition_));
-    ESP_LOGI(TAG, "esp_ota_set_boot_partition succeeded");
     esp_restart();
 };
 
@@ -73,6 +72,7 @@ bool UpgradeHandler::partitionValid()
 };
 
 void UpgradeHandler::fail(){
+    image_size_ = 0;
     if(update_handle_)
         esp_ota_end(update_handle_);
 };

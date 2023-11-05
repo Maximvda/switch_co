@@ -34,6 +34,7 @@ namespace driver
         Mutex m_;
 
         void setUint8(const ConfigKey key, uint8_t value);
+        void getUint8(const ConfigKey key);
         void setString(const ConfigKey key, std::string value);
         void getString(const ConfigKey key);
         void getBool(const ConfigKey key);

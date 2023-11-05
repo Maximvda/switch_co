@@ -12,7 +12,7 @@ const static char* TAG = "can thread";
 void CanTask::onStart()
 {
     ESP_LOGI(TAG, "started.");
-    can_driver_.init(
+    can_driver.init(
         [this](const GincoMessage& mes){
             this->handleCanMes(mes);
         }
@@ -21,7 +21,7 @@ void CanTask::onStart()
 
 void CanTask::tick()
 {
-    can_driver_.tick();
+    can_driver.tick();
 }
 
 void CanTask::handleCanMes(const GincoMessage& message)
@@ -38,31 +38,23 @@ void CanTask::handleCanMes(const GincoMessage& message)
         upgrade_handler_.handle(message);
         return;
     }
+    if (message.function == Function::UPGRADE_FINISHED)
+    {
+        upgrade_handler_.fail();
+        return;
+    }
     app::taskFinder().ginco().frameReady(message);
 }
 
 void CanTask::handle(Message& message)
 {
     switch (message.event()) {
-    case EVENT_CAN_RECEIVED:
+    case EVENT_CAN_TRANSMIT:
     {
         if (auto mes = message.takeValue<GincoMessage>())
         {
-
+            can_driver.transmit(*mes.get());
         }
-        break;
-    }
-    case EVENT_CAN_TRANSMIT:
-    {
-        if(auto mes = message.takeValue<twai_message_t>())
-        {
-            can_driver_.transmit(*mes.get());
-        }
-        break;
-    }
-    case EVENT_CAN_TICK:
-    {
-        can_driver_.tick();
         break;
     }
     default:

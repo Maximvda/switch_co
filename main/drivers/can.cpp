@@ -42,25 +42,35 @@ void CanDriver::init(MessageCb cb_fnc){
 void CanDriver::tick()
 {
     twai_message_t message;
-    while (twai_receive(&message, 50) == ESP_OK)
+    /* As long as frames are ready process them and aknowledge them! */
+    while(twai_receive(&message, 50) == ESP_OK)
     {
         /* Frame received, always aknowledge! TODO: Optimise? */
         GincoMessage mes_data(message);
-        transmit(mes_data.acknowledge().canMessage()); /* Aknowledge sent */
+        auto ack = mes_data.acknowledge();
+        transmit(ack); /* Aknowledge sent */
         /* Handle the message */
         message_cb_(mes_data);
     }
 }
 
-bool CanDriver::transmit(const twai_message_t& can_mes){
-    esp_err_t res = twai_transmit(&can_mes, 50);
-    if (res == ESP_ERR_INVALID_STATE)
+bool CanDriver::transmit(GincoMessage &can_mes, bool blocking)
+{
+    esp_err_t res = twai_transmit(&can_mes.canMessage(), 50);
+    if (blocking && res == ESP_OK)
     {
-        /* TODO: Handle buss off! */
+        twai_message_t message;
+        if(twai_receive(&message, 50) == ESP_OK)
+        {
+            auto compare = GincoMessage(message);
+            return compare.isAcknowledge(can_mes);
+        }
+        ESP_LOGW(TAG, "Failed to receive acknowledge!");
+        return false;
     }
     if (res != ESP_OK)
     {
-        ESP_LOGW(TAG, "FAiled to transmit");
+        ESP_LOGW(TAG, "transmit failed %i", res);
     }
     return res == ESP_OK;
 }

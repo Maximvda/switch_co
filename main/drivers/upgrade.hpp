@@ -17,7 +17,7 @@ namespace driver
         private:
             const esp_partition_t* ota_partition_;
             esp_ota_handle_t update_handle_;
-            uint64_t image_size_;
+            uint64_t image_size_ {0};
             uint32_t mes_received_ {0};
 
             void complete();
