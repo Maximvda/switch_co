@@ -53,6 +53,11 @@ void ConfigDriver::setKey(const ConfigKey key, data_variant data)
         config_data_[key] = data;
         setString(key, std::get<std::string>(data));
     }
+    else if (std::holds_alternative<std::uint8_t>(data))
+    {
+        config_data_[key] = data;
+        setUint8(key, std::get<uint8_t>(data));
+    }
 }
 
 void ConfigDriver::getString(const ConfigKey key)

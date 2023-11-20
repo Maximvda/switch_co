@@ -24,7 +24,7 @@ namespace driver
     private:
         ConfigDriver();
 
-        using data_variant = std::variant<bool, std::string>;
+        using data_variant = std::variant<bool, std::string, uint8_t>;
 
         nvs_handle_t nvs_handle_;
         std::map<ConfigKey, data_variant> config_data_;
