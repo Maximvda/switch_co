@@ -21,7 +21,7 @@ namespace app {
     private:
         UpgradeHandler upgrade_handler_;
 
-        void handleCanMes(const GincoMessage& mes);
+        void handleCanMes(GincoMessage& mes);
 
         void handle(utils::Message&) override;
         void onStart() override;

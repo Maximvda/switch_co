@@ -14,14 +14,12 @@ void CanDriver::init(MessageCb cb_fnc){
         GPIO_NUM_35,
         TWAI_MODE_NORMAL
     );
-    g_config.rx_queue_len = 200;
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
     f_config.acceptance_code = 0x0;
     f_config.acceptance_mask = 0x3ffffff; // Don't accept events
 
     g_config.intr_flags = ESP_INTR_FLAG_IRAM;
-    //g_config.alerts_enabled = TWAI_ALERT_ALL;
 
     //Install CAN driver
     if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
@@ -47,27 +45,17 @@ void CanDriver::tick()
     {
         /* Frame received, always aknowledge! TODO: Optimise? */
         GincoMessage mes_data(message);
-        auto ack = mes_data.acknowledge();
-        transmit(ack); /* Aknowledge sent */
+        message.data_length_code = 0;
+        message.identifier |= (1<<16); /* Set acknowledge bit high */
+        twai_transmit(&message, 50); /* Aknowledge sent */
         /* Handle the message */
         message_cb_(mes_data);
     }
 }
 
-bool CanDriver::transmit(GincoMessage &can_mes, bool blocking)
+bool CanDriver::transmit(GincoMessage &can_mes)
 {
     esp_err_t res = twai_transmit(&can_mes.canMessage(), 50);
-    if (blocking && res == ESP_OK)
-    {
-        twai_message_t message;
-        if(twai_receive(&message, 50) == ESP_OK)
-        {
-            auto compare = GincoMessage(message);
-            return compare.isAcknowledge(can_mes);
-        }
-        ESP_LOGW(TAG, "Failed to receive acknowledge!");
-        return false;
-    }
     if (res != ESP_OK)
     {
         ESP_LOGW(TAG, "transmit failed %i", res);

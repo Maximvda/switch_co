@@ -12,7 +12,6 @@ static void staticPressCallback(void* arg);
 const static char* TAG = {"input"};
 
 using modules::Input;
-using data::Function;
 
 Input::Input(uint8_t new_id, bool button)
 {
@@ -43,16 +42,6 @@ void Input::createTimers()
 
 void Input::handleMessage(GincoMessage& message)
 {
-    switch(message.function)
-    {
-        case Function::REQUEST_STATE:
-            break;
-        default:
-            break;
-    }
-    // uint8_t value = static_cast<uint8_t>(driver::gpio::get_level(id));
-
-    // message.acknowledge(1, &value);
 }
 
 void Input::pressCallback()

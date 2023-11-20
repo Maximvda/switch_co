@@ -23,8 +23,8 @@ namespace driver
             void complete();
             bool partitionValid();
         public:
-            bool init(const GincoMessage& message);
-            bool handle(const GincoMessage& message);
+            bool init(GincoMessage& message);
+            bool handle(GincoMessage& message);
             void fail();
     };
 

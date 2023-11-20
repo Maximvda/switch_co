@@ -2,12 +2,14 @@
 
 #include "esp_log.h"
 
+#include "supervisor.hpp"
+
 using driver::UpgradeHandler;
 using data::GincoMessage;
 
 const char * TAG = "Upgrade";
 
-bool UpgradeHandler::init(const GincoMessage& message)
+bool UpgradeHandler::init(GincoMessage& message)
 {
     if (image_size_ != 0)
     {
@@ -18,7 +20,7 @@ bool UpgradeHandler::init(const GincoMessage& message)
         ESP_LOGE(TAG, "Passive OTA partition not found");
         return false;
     }
-    image_size_ = message.data;
+    image_size_ = message.data<uint32_t>();
     if (image_size_ > ota_partition_->size){
         ESP_LOGE(TAG, "Image size too large");
         return false;
@@ -29,15 +31,15 @@ bool UpgradeHandler::init(const GincoMessage& message)
     return true;
 };
 
-bool UpgradeHandler::handle(const GincoMessage& message)
+bool UpgradeHandler::handle(GincoMessage& message)
 {
     mes_received_++;
-    image_size_ -=  message.data_length;
+    image_size_ -=  message.length();
     if ((mes_received_ % 1000) == 0)
     {
         ESP_LOGI(TAG, "prog %lu | %llu", mes_received_, image_size_);
     }
-    ESP_ERROR_CHECK(esp_ota_write(update_handle_, &message.data, message.data_length));
+    ESP_ERROR_CHECK(esp_ota_write(update_handle_, message.data<uint8_t*>(), message.length()));
     if (image_size_ == 0)
     {
         complete();

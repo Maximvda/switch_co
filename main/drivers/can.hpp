@@ -16,13 +16,13 @@ namespace driver {
     class CanDriver
     {
     private:
-        using MessageCb = std::function<void(const GincoMessage& mes)>;
+        using MessageCb = std::function<void(GincoMessage& mes)>;
         MessageCb message_cb_;
     public:
         void init(MessageCb cb_fnc);
         void tick();
 
-        bool transmit(GincoMessage &message, bool blocking = false);
+        bool transmit(GincoMessage &message);
     };
 
 }

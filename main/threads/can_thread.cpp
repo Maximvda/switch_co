@@ -5,7 +5,7 @@
 
 using namespace app;
 using utils::Message;
-using data::Function;
+using data::ConfigFunction;
 
 const static char* TAG = "can thread";
 
@@ -13,7 +13,7 @@ void CanTask::onStart()
 {
     ESP_LOGI(TAG, "started.");
     can_driver.init(
-        [this](const GincoMessage& mes){
+        [this](GincoMessage& mes){
             this->handleCanMes(mes);
         }
     );
@@ -24,24 +24,29 @@ void CanTask::tick()
     can_driver.tick();
 }
 
-void CanTask::handleCanMes(const GincoMessage& message)
+void CanTask::handleCanMes(GincoMessage& message)
 {
     /*TODO: Handle can frame */
     /*TODO: CHECK IF FRAME IS FOR THIS DEVICE OR DIFFERENT DEVICE */
-    if (message.function == Function::UPGRADE)
+    switch(message.function<ConfigFunction>())
     {
-        upgrade_handler_.init(message);
-        return;
-    }
-    if (message.function == Function::FW_IMAGE)
-    {
-        upgrade_handler_.handle(message);
-        return;
-    }
-    if (message.function == Function::UPGRADE_FINISHED)
-    {
-        upgrade_handler_.fail();
-        return;
+        case ConfigFunction::UPGRADE:
+        {
+            upgrade_handler_.init(message);
+            return;
+        }
+        case ConfigFunction::FW_IMAGE:
+        {
+            upgrade_handler_.handle(message);
+            return;
+        }
+        case ConfigFunction::UPGRADE_FINISHED:
+        {
+            upgrade_handler_.fail();
+            return;
+        }
+        default:
+            break;
     }
     app::taskFinder().ginco().frameReady(message);
 }
