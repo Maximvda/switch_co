@@ -101,33 +101,47 @@ namespace data
             can_message_.identifier |= static_cast<uint8_t>(value);
         }
 
-        twai_message_t& canMessage() {return can_message_;};
+        twai_message_t& message() {return can_message_;};
 
         bool send(bool acknowledge=false);
 
-        template<typename T>
-        void data(T value, uint8_t length = 0)
+        template<typename T, bool OFFSET=false >
+        void data(T value, uint8_t size = 0)
         {
             if constexpr(std::is_unsigned_v<T>)
             {
-                can_message_.data_length_code = sizeof(T);
-                memcpy(can_message_.data, &value, sizeof(T));
+                if constexpr(OFFSET)
+                {
+                    void* d_ptr = can_message_.data + sizeof(T)*size;
+                    memcpy(d_ptr, &value, sizeof(T));
+                }
+                else
+                {
+                    can_message_.data_length_code = sizeof(T);
+                    memcpy(can_message_.data, &value, sizeof(T));
+                }
             }
             else if constexpr(std::is_pointer_v<T>)
             {
                 assert(sizeof(T) != 1); /* Can implement this but multiplication required */
-                can_message_.data_length_code = length;
-                memcpy(can_message_.data, value, length);
+                can_message_.data_length_code = size;
+                memcpy(can_message_.data, value, size);
             }
         }
 
-        template<typename T>
-        T data()
+        template<typename T, bool OFFSET=false >
+        T data(uint8_t offset = 0)
         {
             if constexpr(std::is_unsigned_v<T>)
             {
                 T value;
-                memcpy(&value, can_message_.data, sizeof(T));
+                if constexpr(OFFSET)
+                {
+                    void* d_ptr = can_message_.data + sizeof(T)*offset;
+                    memcpy(&value, d_ptr, sizeof(T));
+                }
+                else
+                    memcpy(&value, can_message_.data, sizeof(T));
                 return value;
             }
             else if constexpr(std::is_pointer_v<T>)
