@@ -26,6 +26,7 @@ namespace driver
             bool init(GincoMessage& message);
             bool handle(GincoMessage& message);
             void fail();
+            bool upgrading(){return image_size_ != 0;};
     };
 
 } // namespace driver

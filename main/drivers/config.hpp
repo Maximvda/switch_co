@@ -4,6 +4,7 @@
 #include <map>
 #include <variant>
 #include <string>
+
 /* esp includes */
 #include "nvs_flash.h"
 
@@ -33,11 +34,45 @@ namespace driver
 
         Mutex m_;
 
-        void setUint8(const ConfigKey key, uint8_t value);
-        void getUint8(const ConfigKey key);
-        void setString(const ConfigKey key, std::string value);
-        void getString(const ConfigKey key);
-        void getBool(const ConfigKey key);
+        template<typename T>
+        void set(const ConfigKey key, T value)
+        {
+            const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
+            /* Use correct call depending on type */
+            if constexpr(std::is_same_v<T, uint8_t>)
+                nvs_set_u8(nvs_handle_, key_name, value);
+            else if constexpr(std::is_same_v<T, std::string>)
+                nvs_set_str(nvs_handle_, key_name, value.data());
+            else
+                assert(0); /* Type not yet supported */
+            /* Save the new config */
+            nvs_commit(nvs_handle_);
+        }
+
+        template<typename T>
+        void get(const ConfigKey key)
+        {
+            const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
+            if constexpr(std::is_same_v<T, uint8_t> or std::is_same_v<T, bool>)
+            {
+                uint8_t value {0};
+                nvs_get_u8(nvs_handle_, key_name, &value);
+                if constexpr(std::is_same_v<T, uint8_t>)
+                    config_data_[key] = value;
+                else if constexpr(std::is_same_v<T, bool>)
+                    config_data_[key] = value == 1;
+            }
+            else if constexpr(std::is_same_v<T, std::string>)
+            {
+                size_t required_size;
+                nvs_get_str(nvs_handle_, key_name, nullptr, &required_size);
+                char data[required_size];
+                nvs_get_str(nvs_handle_, key_name, data, &required_size);
+                config_data_[key] = std::string(data);
+            }
+            else
+                assert(0); /* Type not yet supported */
+        }
 
     public:
         ConfigDriver(ConfigDriver &other) = delete;
@@ -55,6 +90,7 @@ namespace driver
             return std::get<T>(value);
         }
 
+        /* TODO: can be optimised with compiler stuff as well */
         void setKey(const ConfigKey key, data_variant);
 
         static ConfigDriver& instance();

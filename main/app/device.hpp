@@ -1,5 +1,6 @@
 #pragma once
 
+/* ginco includes */
 #include "config.hpp"
 #include "ginco_types.hpp"
 
@@ -10,15 +11,17 @@ namespace app
     class Device {
         private:
             uint8_t id_ {0};
+            driver::ConfigDriver& config_;
+            uint32_t rng_address_req_;
+            GincoMessage ginco_mes_;
+
+            void requestNewId();
 
         public:
+            Device() : config_(driver::ConfigDriver::instance()){};
             void init();
-            void handleMessage(GincoMessage& message);
-            // void heartbeat();
-            // void toggle_switch(uint8_t switch_id);
-            // void double_press_switch(uint8_t switch_id);
-            // void hold_switch(uint8_t switch_id);
-            // void release_switch(uint8_t switch_id);
+            void secondTick();
+            void handleConfig(GincoMessage& message);
     };
 
 } // namespace app;

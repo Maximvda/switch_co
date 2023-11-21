@@ -1,18 +1,70 @@
 #include "device.hpp"
 
+/* esp includes */
+#include "esp_random.h"
+#include "esp_log.h"
+
 #include "can.hpp"
+#include "concurrent.hpp"
+#include "supervisor.hpp"
 
 using app::Device;
 using data::ConfigFunction;
+using data::FeatureType;
+using driver::ConfigKey;
+using utils::Milliseconds;
 
 static const char* TAG = {"Device"};
 
 void Device::init()
 {
-
+    id_ = config_.getKey<uint8_t>(ConfigKey::DEVICE_ID);
+    ESP_LOGI(TAG, "id %u", id_);
+    ginco_mes_.source(id_);
 }
 
-void Device::handleMessage(GincoMessage& message)
+void Device::secondTick()
 {
+    if (id_ == 0)
+    {
+        requestNewId();
+        return;
+    }
+    ginco_mes_.feature(FeatureType::CONFIG);
+    ginco_mes_.function<ConfigFunction>(ConfigFunction::HEARTBEAT);
+    ginco_mes_.send();
+}
 
+void Device::requestNewId()
+{
+    /* Random delay for when modules boot simultaniously */
+    vTaskDelay(Milliseconds(esp_random() & 0xFF).toTicks());
+    ginco_mes_.feature(FeatureType::CONFIG);
+    ginco_mes_.function<ConfigFunction>(ConfigFunction::REQUEST_ADDRESS);
+    rng_address_req_ = esp_random();
+    ginco_mes_.data<uint32_t>(rng_address_req_);
+    ginco_mes_.send();
+    ESP_LOGI(TAG, "New id requested %lu", ginco_mes_.data<uint32_t>());
+}
+
+void Device::handleConfig(GincoMessage& message)
+{
+    switch(message.function<ConfigFunction>())
+    {
+        case ConfigFunction::SET_ADDRESS:
+        {
+            if (message.data<uint32_t>() == rng_address_req_)
+            {
+                id_ = message.data<uint32_t, true>(1);
+                ginco_mes_.source(id_);
+                /* Update can driver to only listen for this address */
+                app::taskFinder().can().address(id_);
+                config_.setKey(ConfigKey::DEVICE_ID, id_);
+                ESP_LOGI(TAG, "received id %u", id_);
+            }
+            break;
+        }
+        default:
+            break;
+    }
 }

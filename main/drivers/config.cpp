@@ -30,13 +30,14 @@ ConfigDriver::ConfigDriver(){
         ESP_LOGE(TAG, "Error (%s) opening NVS handle!\n", esp_err_to_name(err));
     }
     /* Initialise unique strings for each key!! */
-    // key_names_[static_cast<uint16_t>(ConfigKey::WIFI_CONFIGURED)] = "CONFIGURED";
+    key_names_[static_cast<uint16_t>(ConfigKey::DEVICE_ID)] = "DEVICE_ID";
 
     ESP_LOGI(TAG, "loading keys");
     /* Load all values from NVS */
-    // getString(ConfigKey::MQTT_URL);
+    get<uint8_t>(ConfigKey::DEVICE_ID);
     ESP_LOGI(TAG, "keys loaded");
 }
+
 
 void ConfigDriver::setKey(const ConfigKey key, data_variant data)
 {
@@ -46,54 +47,16 @@ void ConfigDriver::setKey(const ConfigKey key, data_variant data)
     if (std::holds_alternative<bool>(data))
     {
         config_data_[key] = data;
-        setUint8(key, static_cast<uint8_t>(std::get<bool>(data)));
+        set<uint8_t>(key, static_cast<uint8_t>(std::get<bool>(data)));
     }
     else if (std::holds_alternative<std::string>(data))
     {
         config_data_[key] = data;
-        setString(key, std::get<std::string>(data));
+        set<std::string>(key, std::get<std::string>(data));
     }
     else if (std::holds_alternative<std::uint8_t>(data))
     {
         config_data_[key] = data;
-        setUint8(key, std::get<uint8_t>(data));
+        set<uint8_t>(key, std::get<uint8_t>(data));
     }
-}
-
-void ConfigDriver::getString(const ConfigKey key)
-{
-    size_t required_size;
-    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    nvs_get_str(nvs_handle_, key_name, nullptr, &required_size);
-    char data[required_size];
-    nvs_get_str(nvs_handle_, key_name, data, &required_size);
-    config_data_[key] = std::string(data);
-}
-
-void ConfigDriver::setString(const ConfigKey key, std::string value){
-    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    nvs_set_str(nvs_handle_, key_name, value.data());
-    nvs_commit(nvs_handle_);
-}
-
-void ConfigDriver::getBool(const ConfigKey key)
-{
-    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    uint8_t value {0};
-    nvs_get_u8(nvs_handle_, key_name, &value);
-    config_data_[key] = value == 1;
-}
-
-void ConfigDriver::setUint8(const ConfigKey key, uint8_t value){
-    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    nvs_set_i8(nvs_handle_, key_name, value);
-    nvs_commit(nvs_handle_);
-}
-
-void ConfigDriver::getUint8(const ConfigKey key)
-{
-    const char* key_name = key_names_[static_cast<uint16_t>(key)].data();
-    uint8_t value {0};
-    nvs_get_u8(nvs_handle_, key_name, &value);
-    config_data_[key] = value;
 }

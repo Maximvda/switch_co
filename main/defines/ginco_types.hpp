@@ -26,7 +26,6 @@ namespace data
         SET_ADDRESS,
         UPGRADE,
         FW_IMAGE,
-        FW_RECEIVER_READY,
         UPGRADE_FINISHED,
         HEARTBEAT
     };
@@ -72,8 +71,8 @@ namespace data
         uint8_t source() const {return static_cast<uint8_t>(can_message_.identifier >> 18);}
         void source(uint8_t src_id)
         {
-            can_message_.identifier &= ~(0xFF << 17); /* First clear the bits of src */
-            can_message_.identifier |= (src_id << 17); /* Now set them */
+            can_message_.identifier &= ~(0xFF << 18); /* First clear the bits of src */
+            can_message_.identifier |= (src_id << 18); /* Now set them */
         }
         bool linked() const {return can_message_.identifier & (1 << 17);}
 
@@ -112,6 +111,7 @@ namespace data
             {
                 if constexpr(OFFSET)
                 {
+                    can_message_.data_length_code = sizeof(T)*(size+1);
                     void* d_ptr = can_message_.data + sizeof(T)*size;
                     memcpy(d_ptr, &value, sizeof(T));
                 }

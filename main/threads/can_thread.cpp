@@ -11,12 +11,13 @@ const static char* TAG = "can thread";
 
 void CanTask::onStart()
 {
-    ESP_LOGI(TAG, "started.");
     can_driver.init(
         [this](GincoMessage& mes){
             this->handleCanMes(mes);
         }
     );
+    app::taskFinder().ginco().canReady();
+    ESP_LOGI(TAG, "started.");
 }
 
 void CanTask::tick()
@@ -26,8 +27,6 @@ void CanTask::tick()
 
 void CanTask::handleCanMes(GincoMessage& message)
 {
-    /*TODO: Handle can frame */
-    /*TODO: CHECK IF FRAME IS FOR THIS DEVICE OR DIFFERENT DEVICE */
     switch(message.function<ConfigFunction>())
     {
         case ConfigFunction::UPGRADE:
@@ -58,7 +57,19 @@ void CanTask::handle(Message& message)
     {
         if (auto mes = message.takeValue<GincoMessage>())
         {
+            if (upgrade_handler_.upgrading())
+            {
+                return;
+            }
             can_driver.transmit(*mes.get());
+        }
+        break;
+    }
+    case EVENT_CAN_SET_ADDRESS:
+    {
+        if (auto value = message.uint32Value())
+        {
+            can_driver.address(value);
         }
         break;
     }
