@@ -9,8 +9,9 @@ const static char* TAG = "gpio thread";
 
 void GpioTask::onStart()
 {
-    ESP_LOGI(TAG, "started.");
     gpio_handler.init();
+    io_expander_.init();
+    ESP_LOGI(TAG, "started.");
 }
 
 void GpioTask::onTimeout()
