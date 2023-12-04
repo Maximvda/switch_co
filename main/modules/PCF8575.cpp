@@ -17,13 +17,13 @@ void PCF8575::set(uint8_t pin, bool value)
     {
         io_map_ &= ~(1 << pin);
     }
-    driver_.write(0x40, reinterpret_cast<uint8_t*>(&io_map_), sizeof(io_map_));
+    driver_.write(0x20, reinterpret_cast<uint8_t*>(&io_map_), sizeof(io_map_));
 }
 
 bool PCF8575::get(uint8_t pin)
 {
     uint8_t buffer[2];
-    driver_.read(0x41, buffer, sizeof(buffer));
+    driver_.read(0x20, buffer, sizeof(buffer));
     uint16_t data = buffer[0] | (buffer[1] << 8);
     return data & (1 << pin);
 }
