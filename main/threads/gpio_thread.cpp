@@ -12,6 +12,7 @@ void GpioTask::onStart()
     gpio_handler.init();
     io_expander_.init();
     ESP_LOGI(TAG, "started.");
+    io_expander_.set(0, false);
 }
 
 void GpioTask::onTimeout()

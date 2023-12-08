@@ -61,7 +61,7 @@ bool GpioDriver::initLed()
 {
     // Prepare and then apply the LEDC PWM timer configuration
     ledc_timer_config_t ledc_timer = {
-        .speed_mode       = LEDC_HIGH_SPEED_MODE,
+        .speed_mode       = LEDC_LOW_SPEED_MODE,
         .duty_resolution  = LEDC_TIMER_13_BIT,
         .timer_num        = LEDC_TIMER_0,
         .freq_hz          = 5000,
@@ -96,8 +96,8 @@ bool GpioDriver::setOutput(uint8_t id, std::variant<bool, uint8_t> value)
     state.pwm_level = std::get<uint8_t>(value);
 
     ledc_channel_t channel = static_cast<ledc_channel_t>(id);
-    ledc_set_duty(LEDC_HIGH_SPEED_MODE, channel, static_cast<uint32_t>(state.pwm_level));
-    return ledc_update_duty(LEDC_HIGH_SPEED_MODE, channel) == ESP_OK;
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, channel, static_cast<uint32_t>(state.pwm_level*30));
+    return ledc_update_duty(LEDC_LOW_SPEED_MODE, channel) == ESP_OK;
 }
 
 bool GpioDriver::changeOutput(const uint8_t id)
@@ -106,13 +106,13 @@ bool GpioDriver::changeOutput(const uint8_t id)
     auto& state = output_states_[id];
     if (state.pwm_mode){
         state.pwm_mode = false;
-        return ledc_stop(LEDC_HIGH_SPEED_MODE, channel, state.high) == ESP_OK;
+        return ledc_stop(LEDC_LOW_SPEED_MODE, channel, state.high) == ESP_OK;
     }
     state.pwm_mode = true;
     /* Change config to pwm mode */
     ledc_channel_config_t ledc_channel = {
         .gpio_num       = outputs_[id],
-        .speed_mode     = LEDC_HIGH_SPEED_MODE,
+        .speed_mode     = LEDC_LOW_SPEED_MODE,
         .channel        = channel,
         .intr_type      = LEDC_INTR_DISABLE,
         .timer_sel      = LEDC_TIMER_0,

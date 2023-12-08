@@ -1,5 +1,7 @@
 #include "PCF8575.hpp"
 
+#include "esp_log.h"
+
 using component::PCF8575;
 
 void PCF8575::init()
@@ -25,5 +27,6 @@ bool PCF8575::get(uint8_t pin)
     uint8_t buffer[2];
     driver_.read(0x20, buffer, sizeof(buffer));
     uint16_t data = buffer[0] | (buffer[1] << 8);
+    ESP_LOGI("PCF", "data %u", data);
     return data & (1 << pin);
 }
