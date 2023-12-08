@@ -22,6 +22,7 @@ namespace app
             void init();
             void secondTick();
             void handleConfig(GincoMessage& message);
+            void handleAction(GincoMessage& message);
     };
 
 } // namespace app;

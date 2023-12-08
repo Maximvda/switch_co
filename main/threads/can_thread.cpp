@@ -65,7 +65,7 @@ void CanTask::handle(Message& message)
         }
         break;
     }
-    case EVENT_CAN_SET_ADDRESS:
+    case EVENT_ADDRESS_UPDATE:
     {
         if (auto value = message.uint32Value())
         {

@@ -47,6 +47,11 @@ void GincoTask::handle(Message& message)
                 ginco_dev_.handleConfig(data);
                 break;
             }
+            case FeatureType::LIGHT:
+            {
+
+                break;
+            }
             default:
                 break;
             }

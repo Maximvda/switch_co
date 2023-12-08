@@ -6,7 +6,6 @@ void GpioHandler::init()
 {
     for(uint8_t i=0; i < driver::GpioDriver::TOTAL_GPIO; i++){
         OutputState state;
-        outputs_[i] = Output(i);
         inputs_[i].createTimers();
     }
     gpio_driver_.init();

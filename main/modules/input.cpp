@@ -1,6 +1,11 @@
 #include "input.hpp"
 
+/* esp includes */
 #include "esp_log.h"
+
+/* ginco includes */
+#include "ginco_types.hpp"
+#include "config.hpp"
 
 #define PRESS_DELAY 0.4*1000*1000
 //#define PERIODIC_DELAY 0.01*1000*1000
@@ -12,11 +17,24 @@ static void staticPressCallback(void* arg);
 const static char* TAG = {"input"};
 
 using modules::Input;
+using data::GincoMessage;
+using driver::ConfigDriver;
+using driver::ConfigKey;
 
 Input::Input(uint8_t new_id, bool button)
 {
     id = new_id;
     button_ = button;
+    message_.source(ConfigDriver::instance().getKey<uint8_t>(ConfigKey::DEVICE_ID));
+    if (button)
+        message_.feature(data::FeatureType::BUTTON);
+    else
+        message_.feature(data::FeatureType::SWITCH);
+}
+
+void Input::updateAddress()
+{
+    message_.source(ConfigDriver::instance().getKey<uint8_t>(ConfigKey::DEVICE_ID));
 }
 
 void Input::createTimers()
@@ -40,31 +58,38 @@ void Input::createTimers()
     esp_timer_create(&periodic_timer_args, &hold_timer_);
 }
 
-void Input::handleMessage(GincoMessage& message)
-{
-}
-
 void Input::pressCallback()
 {
-    ESP_LOGI(TAG, "Really in callback %u", current_press_);
     switch (current_press_){
         case 2:
+        {
             ESP_LOGI(TAG, "First press");
+            message_.function<data::ButtonFunction>(data::ButtonFunction::PRESS);
             break;
+        }
         case 4:
+        {
             ESP_LOGI(TAG, "Second press");
+            message_.function<data::ButtonFunction>(data::ButtonFunction::DOUBLE_PRESS);
             break;
+        }
         case 6:
+        {
             ESP_LOGI(TAG, "Third press");
+            message_.function<data::ButtonFunction>(data::ButtonFunction::TRIPPLE_PRESS);
+            break;
+        }
         default:
             break;
     }
     current_press_ = 0; // Reset the press count
+    message_.send();
 }
 
 void Input::holdCallback()
 {
-    ESP_LOGI(TAG, "Hold callback %u", this->id);
+    message_.function<data::ButtonFunction>(data::ButtonFunction::HOLD);
+    message_.send();
 }
 
 void Input::onToggle(bool state){
@@ -81,27 +106,13 @@ void Input::onToggle(bool state){
 
     // Start timers when button switch
     esp_timer_start_once(press_timer_, PRESS_DELAY);
-    // Only start hold timer when current press is 0 (first press)
-    if (current_press_ == 1 and !hold_active_){
-        hold_active_ = true;
+
+    if (esp_timer_is_active(hold_timer_)){
+        esp_timer_stop(hold_timer_);
+    } else {
         esp_timer_start_periodic(hold_timer_, PERIODIC_DELAY);
     }
-    // Hold timer active so we held button and stop now -> stop timer
-    else if (esp_timer_is_active(hold_timer_)){
-        esp_timer_stop(hold_timer_);
-        hold_active_ = false;
-    }
 }
-
-// void Input::heartbeat(){
-
-// };
-
-// void Input::set_button(bool value){
-//     char config_key[9] = {"inputx"};
-//     sprintf(config_key, "input%i", id);
-//     config::set_key(config_key, value ? 1 : 0);
-// }
 
 static void staticHoldCallback(void* arg)
 {

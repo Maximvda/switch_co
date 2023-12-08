@@ -161,3 +161,8 @@ bool GpioDriver::getLevel(uint8_t id)
 {
     return gpio_get_level(inputs_[id].first) == 1;
 }
+
+bool GpioDriver::getOutputLevel(uint8_t id)
+{
+    return gpio_get_level(outputs_[id]) == 1;
+}

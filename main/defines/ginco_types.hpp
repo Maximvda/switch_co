@@ -16,7 +16,8 @@ namespace data
         BUTTON,
         SWITCH,
         LIGHT,
-        SENSOR
+        SENSOR,
+        ACTION
     };
 
     /* All functions are 8 bits so maximum value of 255 */
@@ -35,7 +36,15 @@ namespace data
         PRESS,
         DOUBLE_PRESS,
         TRIPPLE_PRESS,
-        HOLD, /* TODO: We do hold release or continously send on bus as long as button is held */
+        HOLD,
+    };
+
+    enum class ActionFunction
+    {
+        OUTPUT_TOGGLE,
+        OUTPUT_SET,
+        OUTPUT_CLEAR,
+        SCENE
     };
 
     struct OutputState

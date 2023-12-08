@@ -29,6 +29,12 @@ namespace app {
 
         const char * name() const override { return "Gpio"; }
 
+        bool updateAddress(){return post(EVENT_ADDRESS_UPDATE);}
+
+        bool setOutput(uint8_t id){return post(EVENT_OUTPUT_SET, id);}
+        bool clearOutput(uint8_t id){return post(EVENT_OUTPUT_CLEAR, id);}
+        bool toggleOutput(uint8_t id){return post(EVENT_OUTPUT_TOGGLE, id);}
+
     };
 
 }

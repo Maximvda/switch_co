@@ -62,6 +62,7 @@ namespace driver {
         bool setOutput(uint8_t id, std::variant<bool, uint8_t> value);
         void inputCheck();
         bool getLevel(uint8_t id);
+        bool getOutputLevel(uint8_t id);
     };
 
 }

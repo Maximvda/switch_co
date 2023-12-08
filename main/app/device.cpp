@@ -10,6 +10,7 @@
 
 using app::Device;
 using data::ConfigFunction;
+using data::ActionFunction;
 using data::FeatureType;
 using driver::ConfigKey;
 using utils::Milliseconds;
@@ -57,11 +58,36 @@ void Device::handleConfig(GincoMessage& message)
             {
                 id_ = message.data<uint32_t, true>(1);
                 ginco_mes_.source(id_);
+                config_.setKey(ConfigKey::DEVICE_ID, id_);
                 /* Update can driver to only listen for this address */
                 app::taskFinder().can().address(id_);
-                config_.setKey(ConfigKey::DEVICE_ID, id_);
+                app::taskFinder().gpio().updateAddress();
                 ESP_LOGI(TAG, "received id %u", id_);
             }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void Device::handleAction(GincoMessage& message)
+{
+    switch(message.function<ActionFunction>())
+    {
+        case ActionFunction::OUTPUT_SET:
+        {
+            app::taskFinder().gpio().setOutput(message.data<uint8_t>());
+            break;
+        }
+        case ActionFunction::OUTPUT_CLEAR:
+        {
+            app::taskFinder().gpio().clearOutput(message.data<uint8_t>());
+            break;
+        }
+        case ActionFunction::OUTPUT_TOGGLE:
+        {
+            app::taskFinder().gpio().toggleOutput(message.data<uint8_t>());
             break;
         }
         default:

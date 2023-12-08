@@ -40,7 +40,7 @@ namespace app {
             return post(EVENT_CAN_TRANSMIT, std::make_unique<GincoMessage>(message));
         }
 
-        bool address(uint32_t id){return post(EVENT_CAN_SET_ADDRESS, id);}
+        bool address(uint32_t id){return post(EVENT_ADDRESS_UPDATE, id);}
     };
 
 }

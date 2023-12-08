@@ -6,10 +6,9 @@ const static char* TAG = {"Output"};
 
 using modules::Output;
 
-Output::Output(const uint8_t id){
+Output::Output(const uint8_t id, GpioDriver& driver) : driver_(driver){
     id_ = id;
-    /*TODO: Get state */
-    /*TODO: SET GPIO OUTPUT THROUGH THREAD */
+    state_.high = driver_.getOutputLevel(id);
 }
 
 void Output::handleMessage(GincoMessage& message){
