@@ -7,6 +7,10 @@ using component::PCF8575;
 void PCF8575::init()
 {
     driver_.init(400000);
+    for (int i=0; i < 50; i++){
+        vTaskDelay(100);
+        set(i, 1);
+    }
 }
 
 void PCF8575::set(uint8_t pin, bool value)
