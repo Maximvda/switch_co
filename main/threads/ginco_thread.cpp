@@ -21,36 +21,45 @@ void GincoTask::onStart() {
     timer_ = xTimerCreate("t_second_", Milliseconds(10000).toTicks(), pdTRUE, nullptr, cbTimer);
     ginco_dev_.init();
     ESP_LOGI(TAG, "started.");
+    can_driver_.init([this](GincoMessage data) { this->handleMessage(data); });
 }
 
-void GincoTask::tick() {}
+void GincoTask::tick() { can_driver_.tick(); }
+
+void GincoTask::handleMessage(GincoMessage& data) {
+    switch (data.feature()) {
+        case FeatureType::CONFIG: {
+            ginco_dev_.handleConfig(data);
+            break;
+        }
+        case FeatureType::LIGHT: {
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 void GincoTask::handle(Message& message) {
     switch (message.event()) {
-        case EVENT_CAN_RECEIVED: {
-            /*TODO: handle can messages */
-            if (auto mes = message.takeValue<GincoMessage>()) {
-                auto& data = *mes.get();
-                switch (data.feature()) {
-                    case FeatureType::CONFIG: {
-                        ginco_dev_.handleConfig(data);
-                        break;
-                    }
-                    case FeatureType::LIGHT: {
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-            break;
-        }
         case EVENT_SECOND: {
             ginco_dev_.secondTick();
             break;
         }
         case EVENT_CAN_READY: {
             xTimerStart(timer_, 0);
+            break;
+        }
+        case EVENT_CAN_TRANSMIT: {
+            if (auto mes = message.takeValue<GincoMessage>()) {
+                can_driver_.transmit(*mes.get());
+            }
+            break;
+        }
+        case EVENT_ADDRESS_UPDATE: {
+            if (auto value = message.uint32Value()) {
+                can_driver_.address(value);
+            }
             break;
         }
         default:

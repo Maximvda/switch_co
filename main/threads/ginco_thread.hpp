@@ -5,6 +5,7 @@
 #include "freertos/timers.h"
 
 /* ginco includes */
+#include "can.hpp"
 #include "concurrent.hpp"
 #include "device.hpp"
 #include "events.h"
@@ -20,25 +21,31 @@ namespace app {
 
     class GincoTask: public StandardTask {
        private:
-        Device ginco_dev_;
         TimerHandle_t timer_;
+        driver::CanDriver can_driver_;
+        Device ginco_dev_ {can_driver_};
         void handle(utils::Message&) override;
         void onStart() override;
         void tick() override;
+
+        Milliseconds queueTimeout() override { return 10; }
 
        public:
 
         GincoTask(uint32_t priority): StandardTask(priority, 25) {}
 
-        const char* name() const override { return "ginco"; }
+        void handleMessage(GincoMessage& data);
 
-        bool frameReady(std::unique_ptr<GincoMessage> message) {
-            return post(EVENT_CAN_RECEIVED, std::move(message), 30);
-        }
+        const char* name() const override { return "ginco"; }
 
         bool canReady() { return post(EVENT_CAN_READY); }
 
         bool secondEvent() { return post(EVENT_SECOND); }
+
+        bool transmit(GincoMessage& message) {
+            return can_driver_.transmit(message);
+            // return post(EVENT_CAN_TRANSMIT, std::make_unique<GincoMessage>(message));
+        }
     };
 
 }  // namespace app

@@ -53,7 +53,7 @@ void Device::handleConfig(GincoMessage& message) {
                 ginco_mes_.source(id_);
                 config_.setKey(ConfigKey::DEVICE_ID, id_);
                 /* Update can driver to only listen for this address */
-                app::taskFinder().can().address(id_);
+                can_driver_.address(id_);
                 app::taskFinder().gpio().updateAddress();
                 ESP_LOGI(TAG, "received id %u", id_);
             }

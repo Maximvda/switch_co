@@ -48,14 +48,13 @@ void CanDriver::address(uint8_t id) {
 void CanDriver::tick() {
     twai_message_t message;
     /* As long as frames are ready process them and aknowledge them! */
-    while (twai_receive(&message, 0) == ESP_OK) {
+    while (twai_receive(&message, 10) == ESP_OK) {
         /* Frame received, always aknowledge! TODO: Optimise? */
-        std::unique_ptr<GincoMessage> data = std::make_unique<GincoMessage>(message);
         // message.data_length_code = 0;
         // message.identifier |= (1 << 16); /* Set acknowledge bit high */
         // twai_transmit(&message, 50);     /* Aknowledge sent */
         /* Handle the message */
-        message_cb_(std::move(data));
+        message_cb_(GincoMessage(message));
     }
 }
 

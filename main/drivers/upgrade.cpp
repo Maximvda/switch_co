@@ -41,7 +41,6 @@ bool UpgradeHandler::handle(GincoMessage& message) {
     if (image_size_ == 0) {
         complete();
     }
-    // app::taskFinder().can().wake();
     return true;
 };
 

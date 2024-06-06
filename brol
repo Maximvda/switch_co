@@ -1,0 +1,447 @@
+st
+I (125754) canE (125754) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+E (125754) task_wdt:  - IDLE0 (CPU 0)
+E (125754) task_wdt: Tasks currently running:
+E (125754) task_wdt: CPU 0: ginco
+E (125754) task_wdt: CPU 1: IDLE1
+E (125754) task_wdt: Print CPU 0 (current core) backtrace
+
+
+Backtrace: 0x400DCCAB:0x3FFBEB70 0x400DD070:0x3FFBEB90 0x40083135:0x3FFBEBC0 0x400D49F9:0x3FFB6190 0x400D5953:0x3FFB61C0 0x400D668D:0x3FFB61E0 0x4000BD83:0x3FFB6200 0x4000182A:0x3FFB6220 0x400D61F9:0x3FFB6240 0x400D668D:0x3FFB6260 0x4000BD83:0x3FFB6280 0x4000117D:0x3FFB62A0 0x400592FE:0x3FFB62C0 0x4005937A:0x3FFB62E0 0x400E7F8D:0x3FFB6300 0x400EBF83:0x3FFB6330 0x400EB946:0x3FFB6350 0x400E8035:0x3FFB6670 0x400F50F1:0x3FFB66A0 0x4008DC95:0x3FFB66D0 0x400D8EDA:0x3FFB6720 0x400D8DF7:0x3FFB6740 0x400D9355:0x3FFB6760 0x400D9513:0x3FFB6780 0x400D8CD2:0x3FFB67B0 0x400D83BA:0x3FFB6810 0x400D83D3:0x3FFB6830 0x400D83E1:0x3FFB6870 0x400D8EFB:0x3FFB6890 0x400D8F19:0x3FFB68B0 0x400D831A:0x3FFB6900 0x400D82ED:0x3FFB6920 0x400D8725:0x3FFB6950 0x400883AD:0x3FFB6970
+0x400dccab: task_wdt_timeout_handling at /home/siemie/esp/v5.3/esp-idf/components/esp_system/task_wdt/task_wdt.c:434
+0x400dd070: task_wdt_isr at /home/siemie/esp/v5.3/esp-idf/components/esp_system/task_wdt/task_wdt.c:507
+0x40083135: _xt_lowint1 at /home/siemie/esp/v5.3/esp-idf/components/xtensa/xtensa_vectors.S:1240
+0x400d49f9: uart_tx_char at /home/siemie/esp/v5.3/esp-idf/components/esp_driver_uart/src/uart_vfs.c:168
+0x400d5953: uart_write at /home/siemie/esp/v5.3/esp-idf/components/esp_driver_uart/src/uart_vfs.c:223
+0x400d668d: esp_vfs_write at /home/siemie/esp/v5.3/esp-idf/components/vfs/vfs.c:502 (discriminator 4)
+0x4000bd83: _write_r in ROM
+0x4000182a: write in ROM
+0x400d61f9: console_write at /home/siemie/esp/v5.3/esp-idf/components/esp_vfs_console/vfs_console.c:67
+0x400d668d: esp_vfs_write at /home/siemie/esp/v5.3/esp-idf/components/vfs/vfs.c:502 (discriminator 4)
+0x4000bd83: _write_r in ROM
+0x4000117d: __swrite in ROM
+0x400592fe: __sflush_r in ROM
+0x4005937a: _fflush_r in ROM
+0x400e7f8d: __sfvwrite_r at /builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/fvwrite.c:251
+0x400ebf83: __sprint_r at /builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/vfiprintf.c:429
+ (inlined by) __sprint_r at /builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/vfprintf.c:399
+0x400eb946: _vfprintf_r at /builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/vfprintf.c:1774 (discriminator 1)
+0x400e8035: vprintf at /builds/idf/crosstool-NG/.build/xtensa-esp-elf/src/newlib/newlib/libc/stdio/vprintf.c:34
+0x400f50f1: esp_log_writev at /home/siemie/esp/v5.3/esp-idf/components/log/log.c:210
+0x4008dc95: esp_log_write at /home/siemie/esp/v5.3/esp-idf/components/log/log.c:220
+0x400d8eda: driver::CanDriver::transmit(data::GincoMessage&) at /home/siemie/Code/switchCo/main/drivers/can.cpp:70 (discriminator 1)
+0x400d8df7: app::GincoTask::transmit(data::GincoMessage&) at /home/siemie/Code/switchCo/main/threads/ginco_thread.hpp:46
+ (inlined by) data::GincoMessage::send(bool) at /home/siemie/Code/switchCo/main/defines/ginco_types.cpp:13
+0x400d9355: data::GincoMessage::ack() at /home/siemie/Code/switchCo/common/defines/ginco_types.hpp:84
+0x400d9513: driver::UpgradeHandler::handle(data::GincoMessage&) at /home/siemie/Code/switchCo/main/drivers/upgrade.cpp:39
+0x400d8cd2: app::Device::handleConfig(data::GincoMessage&) at /home/siemie/Code/switchCo/main/app/device.cpp:72
+0x400d83ba: app::GincoTask::handleMessage(data::GincoMessage&) at /home/siemie/Code/switchCo/main/threads/ginco_thread.cpp:32
+0x400d83d3: void std::__invoke_impl<void, app::GincoTask::onStart()::{lambda(data::GincoMessage)#1}&, data::GincoMessage>(std::__invoke_other, app::GincoTask::onStart()::{lambda(data::GincoMessage)#1}&, data::GincoMessage&&) at /home/siemie/Code/switchCo/main/threads/ginco_thread.cpp:24
+ (inlined by) __invoke_impl<void, app::GincoTask::onStart()::<lambda(data::GincoMessage)>&, data::GincoMessage> at /home/siemie/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240305/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/invoke.h:61
+0x400d83e1: std::_Function_handler<void (data::GincoMessage), app::GincoTask::onStart()::{lambda(data::GincoMessage)#1}>::_M_invoke(std::_Any_data const&, data::GincoMessage&&) at /home/siemie/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240305/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/invoke.h:111
+ (inlined by) _M_invoke at /home/siemie/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240305/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/std_function.h:290
+0x400d8efb: std::function<void (data::GincoMessage)>::operator()(data::GincoMessage) const at /home/siemie/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240305/xtensa-esp-elf/xtensa-esp-elf/include/c++/13.2.0/bits/std_function.h:591
+0x400d8f19: driver::CanDriver::tick() at /home/siemie/Code/switchCo/main/drivers/can.cpp:57 (discriminator 1)
+0x400d831a: app::GincoTask::tick() at /home/siemie/Code/switchCo/main/threads/ginco_thread.cpp:27
+0x400d82ed: utils::StandardTask::run() at /home/siemie/Code/switchCo/main/threading/standard_task.cpp:57
+0x400d8725: utils::SupervisedTask::launch(void*) at /home/siemie/Code/switchCo/main/threading/supervised_task.hpp:152 (discriminator 1)
+0x400883ad: vPortTaskWrapper at /home/siemie/esp/v5.3/esp-idf/components/freertos/FreeRTOS-Kernel/portable/xtensa/port.c:134
+
+
+ driver: Transmit execute
+I (125864) Upgrade: prog 8206 | 217989
+I (125864) types: transmit post
+I (125874) can driver: Transmit execute
+I (125874) Upgrade: prog 8207 | 217981
+I (125874) types: transmit post
+I (125884) can driver: Transmit execute
+I (125884) Upgrade: prog 8208 | 217973
+I (125894) types: transmit post
+I (125894) can driver: Transmit execute
+I (125904) Upgrade: prog 8209 | 217965
+I (125904) types: transmit post
+I (125904) can driver: Transmit execute
+I (125914) Upgrade: prog 8210 | 217957
+I (125914) types: transmit post
+I (125924) can driver: Transmit execute
+I (125924) Upgrade: prog 8211 | 217949
+I (125934) types: transmit post
+I (125934) can driver: Transmit execute
+I (125934) Upgrade: prog 8212 | 217941
+I (125944) types: transmit post
+I (125944) can driver: Transmit execute
+I (125954) Upgrade: prog 8213 | 217933
+I (125954) types: transmit post
+I (125954) can driver: Transmit execute
+I (125964) Upgrade: prog 8214 | 217925
+I (125964) types: transmit post
+I (125974) can driver: Transmit execute
+I (125974) Upgrade: prog 8215 | 217917
+I (125984) types: transmit post
+I (125984) can driver: Transmit execute
+I (125984) Upgrade: prog 8216 | 217909
+I (125994) types: transmit post
+I (125994) can driver: Transmit execute
+I (126004) Upgrade: prog 8217 | 217901
+I (126004) types: transmit post
+I (126014) can driver: Transmit execute
+I (126014) Upgrade: prog 8218 | 217893
+I (126014) types: transmit post
+I (126024) can driver: Transmit execute
+I (126024) Upgrade: prog 8219 | 217885
+I (126034) types: transmit post
+I (126034) can driver: Transmit execute
+I (126044) Upgrade: prog 8220 | 217877
+I (126044) types: transmit post
+I (126044) can driver: Transmit execute
+I (126054) Upgrade: prog 8221 | 217869
+I (126054) types: transmit post
+I (126064) can driver: Transmit execute
+I (126064) Upgrade: prog 8222 | 217861
+I (126074) types: transmit post
+I (126074) can driver: Transmit execute
+I (126074) Upgrade: prog 8223 | 217853
+I (126084) types: transmit post
+I (126084) can driver: Transmit execute
+I (126094) Upgrade: prog 8224 | 217845
+I (126094) types: transmit post
+I (126094) can driver: Transmit execute
+I (126104) Upgrade: prog 8225 | 217837
+I (126104) types: transmit post
+I (126114) can driver: Transmit execute
+I (126114) Upgrade: prog 8226 | 217829
+I (126124) types: transmit post
+I (126124) can driver: Transmit execute
+I (126124) Upgrade: prog 8227 | 217821
+I (126134) types: transmit post
+I (126134) can driver: Transmit execute
+I (126144) Upgrade: prog 8228 | 217813
+I (126144) types: transmit post
+I (126154) can driver: Transmit execute
+I (126154) Upgrade: prog 8229 | 217805
+I (126154) types: transmit post
+I (126164) can driver: Transmit execute
+I (126164) Upgrade: prog 8230 | 217797
+I (126174) types: transmit post
+I (126174) can driver: Transmit execute
+I (126184) Upgrade: prog 8231 | 217789
+I (126184) types: transmit post
+I (126184) can driver: Transmit execute
+I (126194) Upgrade: prog 8232 | 217781
+I (126194) types: transmit post
+I (126204) can driver: Transmit execute
+I (126204) Upgrade: prog 8233 | 217773
+I (126214) types: transmit post
+I (126214) can driver: Transmit execute
+I (126214) Upgrade: prog 8234 | 217765
+I (126224) types: transmit post
+I (126224) can driver: Transmit execute
+I (126234) Upgrade: prog 8235 | 217757
+I (126234) types: transmit post
+I (126244) can driver: Transmit execute
+I (126244) Upgrade: prog 8236 | 217749
+I (126244) types: transmit post
+I (126254) can driver: Transmit execute
+I (126254) Upgrade: prog 8237 | 217741
+I (126264) types: transmit post
+I (126264) can driver: Transmit execute
+I (126274) Upgrade: prog 8238 | 217733
+I (126274) types: transmit post
+I (126274) can driver: Transmit execute
+I (126284) Upgrade: prog 8239 | 217725
+I (126284) types: transmit post
+I (126294) can driver: Transmit execute
+I (126294) Upgrade: prog 8240 | 217717
+I (126304) types: transmit post
+I (126304) can driver: Transmit execute
+I (126304) Upgrade: prog 8241 | 217709
+I (126314) types: transmit post
+I (126314) can driver: Transmit execute
+I (126324) Upgrade: prog 8242 | 217701
+I (126324) types: transmit post
+I (126324) can driver: Transmit execute
+I (126334) Upgrade: prog 8243 | 217693
+I (126334) types: transmit post
+I (126344) can driver: Transmit execute
+I (126344) Upgrade: prog 8244 | 217685
+I (126354) types: transmit post
+I (126354) can driver: Transmit execute
+I (126354) Upgrade: prog 8245 | 217677
+I (126364) types: transmit post
+I (126364) can driver: Transmit execute
+I (126374) Upgrade: prog 8246 | 217669
+I (126374) types: transmit post
+I (126384) can driver: Transmit execute
+I (126384) Upgrade: prog 8247 | 217661
+I (126384) types: transmit post
+I (126394) can driver: Transmit execute
+I (126394) Upgrade: prog 8248 | 217653
+I (126404) types: transmit post
+I (126404) can driver: Transmit execute
+I (126414) Upgrade: prog 8249 | 217645
+I (126414) types: transmit post
+I (126414) can driver: Transmit execute
+I (126424) Upgrade: prog 8250 | 217637
+I (126424) types: transmit post
+I (126434) can driver: Transmit execute
+I (126434) Upgrade: prog 8251 | 217629
+I (126444) types: transmit post
+I (126444) can driver: Transmit execute
+I (126444) Upgrade: prog 8252 | 217621
+I (126454) types: transmit post
+I (126454) can driver: Transmit execute
+I (126464) Upgrade: prog 8253 | 217613
+I (126464) types: transmit post
+I (126474) can driver: Transmit execute
+I (126474) Upgrade: prog 8254 | 217605
+I (126474) types: transmit post
+I (126484) can driver: Transmit execute
+I (126484) Upgrade: prog 8255 | 217597
+I (126494) types: transmit post
+I (126494) can driver: Transmit execute
+I (126504) Upgrade: prog 8256 | 217589
+I (126504) types: transmit post
+I (126504) can driver: Transmit execute
+I (126514) Upgrade: prog 8257 | 217581
+I (126514) types: transmit post
+I (126524) can driver: Transmit execute
+I (126524) Upgrade: prog 8258 | 217573
+I (126524) types: transmit post
+I (126534) can driver: Transmit execute
+I (126534) Upgrade: prog 8259 | 217565
+I (126544) types: transmit post
+I (126544) can driver: Transmit execute
+I (126554) Upgrade: prog 8260 | 217557
+I (126554) types: transmit post
+I (126554) can driver: Transmit execute
+I (126564) Upgrade: prog 8261 | 217549
+I (126564) types: transmit post
+I (126574) can driver: Transmit execute
+I (126574) Upgrade: prog 8262 | 217541
+I (126584) types: transmit post
+I (126584) can driver: Transmit execute
+I (126584) Upgrade: prog 8263 | 217533
+I (126594) types: transmit post
+I (126594) can driver: Transmit execute
+I (126604) Upgrade: prog 8264 | 217525
+I (126604) types: transmit post
+I (126614) can driver: Transmit execute
+I (126614) Upgrade: prog 8265 | 217517
+I (126614) types: transmit post
+I (126624) can driver: Transmit execute
+I (126624) Upgrade: prog 8266 | 217509
+I (126634) types: transmit post
+I (126634) can driver: Transmit execute
+I (126644) Upgrade: prog 8267 | 217501
+I (126644) types: transmit post
+I (126644) can driver: Transmit execute
+I (126654) Upgrade: prog 8268 | 217493
+I (126654) types: transmit post
+I (126664) can driver: Transmit execute
+I (126664) Upgrade: prog 8269 | 217485
+I (126674) types: transmit post
+I (126674) can driver: Transmit execute
+I (126674) Upgrade: prog 8270 | 217477
+I (126684) types: transmit post
+I (126684) can driver: Transmit execute
+I (126694) Upgrade: prog 8271 | 217469
+I (126694) types: transmit post
+I (126694) can driver: Transmit execute
+I (126704) Upgrade: prog 8272 | 217461
+I (126704) types: transmit post
+I (126714) can driver: Transmit execute
+I (126714) Upgrade: prog 8273 | 217453
+I (126724) types: transmit post
+I (126724) can driver: Transmit execute
+I (126724) Upgrade: prog 8274 | 217445
+I (126734) types: transmit post
+I (126734) can driver: Transmit execute
+I (126744) Upgrade: prog 8275 | 217437
+I (126744) types: transmit post
+I (126754) can driver: Transmit execute
+I (126754) Upgrade: prog 8276 | 217429
+I (126754) types: transmit post
+I (126764) can driver: Transmit execute
+I (126764) Upgrade: prog 8277 | 217421
+I (126774) types: transmit post
+I (126774) can driver: Transmit execute
+I (126784) Upgrade: prog 8278 | 217413
+I (126784) types: transmit post
+I (126784) can driver: Transmit execute
+I (126794) Upgrade: prog 8279 | 217405
+I (126794) types: transmit post
+I (126804) can driver: Transmit execute
+I (126804) Upgrade: prog 8280 | 217397
+I (126814) types: transmit post
+I (126814) can driver: Transmit execute
+I (126814) Upgrade: prog 8281 | 217389
+I (126824) types: transmit post
+I (126824) can driver: Transmit execute
+I (126834) Upgrade: prog 8282 | 217381
+I (126834) types: transmit post
+I (126844) can driver: Transmit execute
+I (126844) Upgrade: prog 8283 | 217373
+I (126844) types: transmit post
+I (126854) can driver: Transmit execute
+I (126854) Upgrade: prog 8284 | 217365
+I (126864) types: transmit post
+I (126864) can driver: Transmit execute
+I (126874) Upgrade: prog 8285 | 217357
+I (126874) types: transmit post
+I (126874) can driver: Transmit execute
+I (126884) Upgrade: prog 8286 | 217349
+I (126884) types: transmit post
+I (126894) can driver: Transmit execute
+I (126894) Upgrade: prog 8287 | 217341
+I (126904) types: transmit post
+I (126904) can driver: Transmit execute
+I (126904) Upgrade: prog 8288 | 217333
+I (126914) types: transmit post
+I (126914) can driver: Transmit execute
+I (126924) Upgrade: prog 8289 | 217325
+I (126924) types: transmit post
+I (126924) can driver: Transmit execute
+I (126934) Upgrade: prog 8290 | 217317
+I (126934) types: transmit post
+I (126944) can driver: Transmit execute
+I (126944) Upgrade: prog 8291 | 217309
+I (126954) types: transmit post
+I (126954) can driver: Transmit execute
+I (126954) Upgrade: prog 8292 | 217301
+I (126964) types: transmit post
+I (126964) can driver: Transmit execute
+I (126974) Upgrade: prog 8293 | 217293
+I (126974) types: transmit post
+I (126984) can driver: Transmit execute
+I (126984) Upgrade: prog 8294 | 217285
+I (126984) types: transmit post
+I (126994) can driver: Transmit execute
+I (126994) Upgrade: prog 8295 | 217277
+I (127004) types: transmit post
+I (127004) can driver: Transmit execute
+I (127014) Upgrade: prog 8296 | 217269
+I (127014) types: transmit post
+I (127014) can driver: Transmit execute
+I (127024) Upgrade: prog 8297 | 217261
+I (127024) types: transmit post
+I (127034) can driver: Transmit execute
+I (127034) Upgrade: prog 8298 | 217253
+I (127044) types: transmit post
+I (127044) can driver: Transmit execute
+I (127044) Upgrade: prog 8299 | 217245
+I (127054) types: transmit post
+I (127054) can driver: Transmit execute
+I (127064) Upgrade: prog 8300 | 217237
+I (127064) types: transmit post
+I (127064) can driver: Transmit execute
+I (127074) Upgrade: prog 8301 | 217229
+I (127074) types: transmit post
+I (127084) can driver: Transmit execute
+I (127084) Upgrade: prog 8302 | 217221
+I (127094) types: transmit post
+I (127094) can driver: Transmit execute
+I (127094) Upgrade: prog 8303 | 217213
+I (127104) types: transmit post
+I (127104) can driver: Transmit execute
+I (127114) Upgrade: prog 8304 | 217205
+I (127114) types: transmit post
+I (127124) can driver: Transmit execute
+I (127124) Upgrade: prog 8305 | 217197
+I (127124) types: transmit post
+I (127134) can driver: Transmit execute
+I (127134) Upgrade: prog 8306 | 217189
+I (127144) types: transmit post
+I (127144) can driver: Transmit execute
+I (127154) Upgrade: prog 8307 | 217181
+I (127154) types: transmit post
+I (127154) can driver: Transmit execute
+I (127164) Upgrade: prog 8308 | 217173
+I (127164) types: transmit post
+I (127174) can driver: Transmit execute
+I (127174) Upgrade: prog 8309 | 217165
+I (127184) types: transmit post
+I (127184) can driver: Transmit execute
+I (127184) Upgrade: prog 8310 | 217157
+I (127194) types: transmit post
+I (127194) can driver: Transmit execute
+I (127204) Upgrade: prog 8311 | 217149
+I (127204) types: transmit post
+I (127214) can driver: Transmit execute
+I (127214) Upgrade: prog 8312 | 217141
+I (127214) types: transmit post
+I (127224) can driver: Transmit execute
+I (127224) Upgrade: prog 8313 | 217133
+I (127234) types: transmit post
+I (127234) can driver: Transmit execute
+I (127244) Upgrade: prog 8314 | 217125
+I (127244) types: transmit post
+I (127244) can driver: Transmit execute
+I (127254) Upgrade: prog 8315 | 217117
+I (127254) types: transmit post
+I (127264) can driver: Transmit execute
+I (127264) Upgrade: prog 8316 | 217109
+I (127274) types: transmit post
+I (127274) can driver: Transmit execute
+I (127274) Upgrade: prog 8317 | 217101
+I (127284) types: transmit post
+I (127284) can driver: Transmit execute
+I (127294) Upgrade: prog 8318 | 217093
+I (127294) types: transmit post
+I (127294) can driver: Transmit execute
+I (127304) Upgrade: prog 8319 | 217085
+I (127304) types: transmit post
+I (127314) can driver: Transmit execute
+I (127314) Upgrade: prog 8320 | 217077
+I (127324) types: transmit post
+I (127324) can driver: Transmit execute
+I (127324) Upgrade: prog 8321 | 217069
+I (127334) types: transmit post
+I (127334) can driver: Transmit execute
+I (127344) Upgrade: prog 8322 | 217061
+I (127344) types: transmit post
+I (127354) can driver: Transmit execute
+I (127354) Upgrade: prog 8323 | 217053
+I (127354) types: transmit post
+I (127364) can driver: Transmit execute
+I (127364) Upgrade: prog 8324 | 217045
+I (127374) types: transmit post
+I (127374) can driver: Transmit execute
+I (127384) Upgrade: prog 8325 | 217037
+I (127384) types: transmit post
+I (127384) can driver: Transmit execute
+I (127394) Upgrade: prog 8326 | 217029
+I (127394) types: transmit post
+I (127404) can driver: Transmit execute
+I (127404) Upgrade: prog 8327 | 217021
+I (127414) types: transmit post
+I (127414) can driver: Transmit execute
+I (127414) Upgrade: prog 8328 | 217013
+I (127424) types: transmit post
+I (127424) can driver: Transmit execute
+I (127434) Upgrade: prog 8329 | 217005
+I (127434) types: transmit post
+I (127434) can driver: Transmit execute
+I (127444) Upgrade: prog 8330 | 216997
+I (127444) types: transmit post
+I (127454) can driver: Transmit execute
+I (127454) Upgrade: prog 8331 | 216989
+I (127464) types: transmit post
+I (127464) can driver: Transmit execute
+I (127464) Upgrade: prog 8332 | 216981
+I (127474) types: transmit post
+I (127474) can driver: Transmit execute
+I (127484) Upgrade: prog 8333 | 216973
+I (127484) types: transmit post
+I (127494) can driver: Transmit execute
+I (127494) Upgrade: prog 8334 | 216965
+I (127494) types: transmit post
+I (127504) can driver: Transmit execute
+I (127504) Upgrade: prog 8335 | 216957
+I (127514) types: transmit post
+I (127514) can driver: Transmit execute
+I (127524) Upgrade: prog 8336 | 216949
+I (127524) types: transmit post
+I (127524) can driver: Transmit execute
+I (127534) Upgrade: prog 8337 | 216941
+I (127534) types: transmit post
+I (127544) can driver: Transmit execute

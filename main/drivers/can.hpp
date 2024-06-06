@@ -16,7 +16,7 @@ namespace driver {
 
     class CanDriver {
        private:
-        using MessageCb = std::function<void(std::unique_ptr<GincoMessage> mes)>;
+        using MessageCb = std::function<void(GincoMessage mes)>;
         MessageCb message_cb_;
         /* Id of the module to filter out can messages */
         uint8_t id_ {0};
@@ -37,7 +37,7 @@ namespace driver {
          * @return true When queued successfully
          * @return false When error occured during queing
          */
-        bool transmit(GincoMessage &message);
+        bool transmit(GincoMessage& message);
 
         /**
          * @brief Set address of module
