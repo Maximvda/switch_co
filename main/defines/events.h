@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAJOR_VERSION 0
+#define MINOR_VERSION 1
 
 typedef enum {
     EVENT_UNUSED_EVENT,
@@ -9,9 +11,9 @@ typedef enum {
     EVENT_CAN_RECEIVED,
     EVENT_CAN_READY,
     EVENT_ADDRESS_UPDATE,
+    EVENT_WAKE,
 
     EVENT_OUTPUT_SET,
     EVENT_OUTPUT_CLEAR,
     EVENT_OUTPUT_TOGGLE
 } eEventType;
-

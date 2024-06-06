@@ -24,6 +24,7 @@ void Device::init() {
 }
 
 void Device::secondTick() {
+    if (upgrade_handler_.upgrading()) return;
     if (id_ == 0) {
         requestNewId();
         return;
@@ -57,6 +58,23 @@ void Device::handleConfig(GincoMessage& message) {
                 ESP_LOGI(TAG, "received id %u", id_);
             }
             break;
+        }
+        case ConfigFunction::RESET_ADDRESS: {
+            id_ = 0;
+            config_.setKey(ConfigKey::DEVICE_ID, static_cast<uint8_t>(0));
+            break;
+        }
+        case ConfigFunction::UPGRADE: {
+            upgrade_handler_.init(message);
+            return;
+        }
+        case ConfigFunction::FW_IMAGE: {
+            upgrade_handler_.handle(message);
+            return;
+        }
+        case ConfigFunction::UPGRADE_FINISHED: {
+            upgrade_handler_.fail();
+            return;
         }
         default:
             break;

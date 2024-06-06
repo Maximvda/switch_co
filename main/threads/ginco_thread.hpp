@@ -5,42 +5,40 @@
 #include "freertos/timers.h"
 
 /* ginco includes */
-#include "standard_task.hpp"
-#include "ginco_types.hpp"
 #include "concurrent.hpp"
 #include "device.hpp"
 #include "events.h"
+#include "ginco_types.hpp"
+#include "standard_task.hpp"
 
-using utils::StandardTask;
-using utils::Milliseconds;
-using data::GincoMessage;
 using app::Device;
+using data::GincoMessage;
+using utils::Milliseconds;
+using utils::StandardTask;
 
 namespace app {
 
-    class GincoTask : public StandardTask {
-
-    private:
+    class GincoTask: public StandardTask {
+       private:
         Device ginco_dev_;
         TimerHandle_t timer_;
         void handle(utils::Message&) override;
         void onStart() override;
         void tick() override;
 
-    public:
+       public:
 
-        GincoTask(uint32_t priority) : StandardTask(priority) {}
+        GincoTask(uint32_t priority): StandardTask(priority, 25) {}
 
-        const char * name() const override { return "ginco"; }
+        const char* name() const override { return "ginco"; }
 
-        bool frameReady(const GincoMessage& message)
-        {
-            return post(EVENT_CAN_RECEIVED, std::make_unique<GincoMessage>(message));
+        bool frameReady(std::unique_ptr<GincoMessage> message) {
+            return post(EVENT_CAN_RECEIVED, std::move(message), 30);
         }
 
-        bool canReady(){return post(EVENT_CAN_READY);}
+        bool canReady() { return post(EVENT_CAN_READY); }
 
-        bool secondEvent(){return post(EVENT_SECOND);}
+        bool secondEvent() { return post(EVENT_SECOND); }
     };
 
-}
+}  // namespace app

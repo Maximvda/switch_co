@@ -5,6 +5,7 @@ file(GLOB private_lib
     threads/*.cpp
     app/*.cpp
     defines/*.cpp
+    ../common/defines/*.cpp
 )
 
 idf_component_register(
@@ -19,4 +20,5 @@ idf_component_register(
         "app"
         "drivers"
         "modules"
+        "../common/defines"
 )
