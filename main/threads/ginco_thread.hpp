@@ -8,7 +8,6 @@
 #include "can.hpp"
 #include "concurrent.hpp"
 #include "device.hpp"
-#include "events.h"
 #include "ginco_types.hpp"
 #include "standard_task.hpp"
 
@@ -21,6 +20,11 @@ namespace app {
 
     class GincoTask: public StandardTask {
        private:
+
+        enum events {
+            SECOND_EVENT,
+        };
+
         TimerHandle_t timer_;
         driver::CanDriver can_driver_;
         Device ginco_dev_ {can_driver_};
@@ -38,14 +42,9 @@ namespace app {
 
         const char* name() const override { return "ginco"; }
 
-        bool canReady() { return post(EVENT_CAN_READY); }
+        bool secondEvent() { return post(SECOND_EVENT); }
 
-        bool secondEvent() { return post(EVENT_SECOND); }
-
-        bool transmit(GincoMessage& message) {
-            return can_driver_.transmit(message);
-            // return post(EVENT_CAN_TRANSMIT, std::make_unique<GincoMessage>(message));
-        }
+        bool transmit(GincoMessage& message) { return can_driver_.transmit(message); }
     };
 
 }  // namespace app

@@ -16,6 +16,7 @@ static void staticPressCallback(void* arg);
 
 const static char* TAG = {"input"};
 
+using data::ButtonFunction;
 using data::GincoMessage;
 using driver::ConfigDriver;
 using driver::ConfigKey;
@@ -25,10 +26,6 @@ Input::Input(uint8_t new_id, bool button) {
     id = new_id;
     button_ = button;
     message_.source(ConfigDriver::instance().getKey<uint8_t>(ConfigKey::DEVICE_ID));
-    if (button)
-        message_.feature(data::FeatureType::BUTTON);
-    else
-        message_.feature(data::FeatureType::SWITCH);
 }
 
 void Input::updateAddress() { message_.source(ConfigDriver::instance().getKey<uint8_t>(ConfigKey::DEVICE_ID)); }
@@ -45,17 +42,17 @@ void Input::pressCallback() {
     switch (current_press_) {
         case 2: {
             ESP_LOGI(TAG, "First press");
-            message_.function<data::ButtonFunction>(data::ButtonFunction::PRESS);
+            message_.function(ButtonFunction::PRESS);
             break;
         }
         case 4: {
             ESP_LOGI(TAG, "Second press");
-            message_.function<data::ButtonFunction>(data::ButtonFunction::DOUBLE_PRESS);
+            message_.function(ButtonFunction::DOUBLE_PRESS);
             break;
         }
         case 6: {
             ESP_LOGI(TAG, "Third press");
-            message_.function<data::ButtonFunction>(data::ButtonFunction::TRIPPLE_PRESS);
+            message_.function(ButtonFunction::TRIPPLE_PRESS);
             break;
         }
         default:
@@ -66,7 +63,7 @@ void Input::pressCallback() {
 }
 
 void Input::holdCallback() {
-    message_.function<data::ButtonFunction>(data::ButtonFunction::HOLD);
+    message_.function(ButtonFunction::HOLD);
     // message_.send();
 }
 

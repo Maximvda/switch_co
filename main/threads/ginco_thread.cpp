@@ -22,6 +22,7 @@ void GincoTask::onStart() {
     ginco_dev_.init();
     ESP_LOGI(TAG, "started.");
     can_driver_.init([this](GincoMessage data) { this->handleMessage(data); });
+    xTimerStart(timer_, 0);
 }
 
 void GincoTask::tick() { can_driver_.tick(); }
@@ -42,24 +43,8 @@ void GincoTask::handleMessage(GincoMessage& data) {
 
 void GincoTask::handle(Message& message) {
     switch (message.event()) {
-        case EVENT_SECOND: {
+        case SECOND_EVENT: {
             ginco_dev_.secondTick();
-            break;
-        }
-        case EVENT_CAN_READY: {
-            xTimerStart(timer_, 0);
-            break;
-        }
-        case EVENT_CAN_TRANSMIT: {
-            if (auto mes = message.takeValue<GincoMessage>()) {
-                can_driver_.transmit(*mes.get());
-            }
-            break;
-        }
-        case EVENT_ADDRESS_UPDATE: {
-            if (auto value = message.uint32Value()) {
-                can_driver_.address(value);
-            }
             break;
         }
         default:

@@ -1,11 +1,11 @@
 file(GLOB private_lib
     modules/*.cpp
     drivers/*.cpp
-    threading/*.cpp
     threads/*.cpp
     app/*.cpp
     defines/*.cpp
     ../common/defines/*.cpp
+    ../common/threading/*.cpp
 )
 
 idf_component_register(
@@ -15,10 +15,10 @@ idf_component_register(
     INCLUDE_DIRS
         "."
         "defines"
-        "threading"
         "threads"
         "app"
         "drivers"
         "modules"
         "../common/defines"
+        "../common/threading"
 )

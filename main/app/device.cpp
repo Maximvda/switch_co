@@ -29,7 +29,6 @@ void Device::secondTick() {
         requestNewId();
         return;
     }
-    ginco_mes_.feature(FeatureType::CONFIG);
     ginco_mes_.function(ConfigFunction::HEARTBEAT);
     ginco_mes_.send();
 }
@@ -37,8 +36,7 @@ void Device::secondTick() {
 void Device::requestNewId() {
     /* Random delay for when modules boot simultaniously */
     vTaskDelay(Milliseconds(esp_random() & 0xFF).toTicks());
-    ginco_mes_.feature(FeatureType::CONFIG);
-    ginco_mes_.function<ConfigFunction>(ConfigFunction::REQUEST_ADDRESS);
+    ginco_mes_.function(ConfigFunction::REQUEST_ADDRESS);
     rng_address_req_ = esp_random();
     ginco_mes_.data<uint32_t>(rng_address_req_);
     ginco_mes_.send();
@@ -56,6 +54,7 @@ void Device::handleConfig(GincoMessage& message) {
                 can_driver_.address(id_);
                 app::taskFinder().gpio().updateAddress();
                 ESP_LOGI(TAG, "received id %u", id_);
+                message.ack();
             }
             break;
         }
