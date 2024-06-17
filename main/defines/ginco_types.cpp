@@ -8,7 +8,4 @@ static constexpr char* TAG = "types";
 
 using data::GincoMessage;
 
-bool GincoMessage::send(bool acknowledge)
-{
-    return app::taskFinder().can().transmit(*this);
-}
+bool GincoMessage::send(bool acknowledge) { return app::taskFinder().ginco().transmit(*this); }

@@ -2,6 +2,7 @@
 
 /* std includes */
 #include <functional>
+#include <memory>
 
 /* Esp includes */
 #include "driver/twai.h"
@@ -13,16 +14,16 @@ using data::GincoMessage;
 
 namespace driver {
 
-    class CanDriver
-    {
-    private:
-        using MessageCb = std::function<void(GincoMessage& mes)>;
+    class CanDriver {
+       private:
+        using MessageCb = std::function<void(GincoMessage mes)>;
         MessageCb message_cb_;
         /* Id of the module to filter out can messages */
         uint8_t id_ {0};
         /* Start the can driver */
         void start();
-    public:
+
+       public:
         /* Init module with callback function to process messages */
         void init(MessageCb cb_fnc);
 
@@ -36,7 +37,7 @@ namespace driver {
          * @return true When queued successfully
          * @return false When error occured during queing
          */
-        bool transmit(GincoMessage &message);
+        bool transmit(GincoMessage& message);
 
         /**
          * @brief Set address of module
@@ -46,4 +47,4 @@ namespace driver {
         void address(uint8_t id);
     };
 
-}
+}  // namespace driver
