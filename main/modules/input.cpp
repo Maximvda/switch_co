@@ -59,7 +59,7 @@ void Input::pressCallback() {
             break;
     }
     current_press_ = 0;  // Reset the press count
-    // message_.send();
+    message_.send();
 }
 
 void Input::holdCallback() {

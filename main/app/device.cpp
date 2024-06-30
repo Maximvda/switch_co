@@ -18,18 +18,33 @@ using utils::Milliseconds;
 static const char* TAG = {"Device"};
 
 void Device::init() {
+    rng_address_req_ = esp_random();
     id_ = config_.getKey<uint8_t>(ConfigKey::DEVICE_ID);
     ESP_LOGI(TAG, "id %u", id_);
     ginco_mes_.source(id_);
+    const esp_app_desc_t* description = esp_app_get_description();
+    char* str = (char*)description->version;
+    char* end = (char*)description->version;
+    for (uint32_t i = 0; i < 3; i++) {
+        version_numbers_[i] = strtol(str, &end, 10);
+        while (*end == '.') {
+            end++;
+        }
+        str = end;
+    }
 }
 
-void Device::secondTick() {
+void Device::periodic() {
     if (upgrade_handler_.upgrading()) return;
     if (id_ == 0) {
         requestNewId();
         return;
     }
     ginco_mes_.function(ConfigFunction::HEARTBEAT);
+    /* encode the version number in the heartbeat */
+    ginco_mes_.data<uint16_t>(static_cast<uint16_t>(version_numbers_[0]));
+    ginco_mes_.data<uint16_t, true>(static_cast<uint16_t>(version_numbers_[1]), 1);
+    ginco_mes_.data<uint32_t, true>(version_numbers_[2], 1);
     ginco_mes_.send();
 }
 

@@ -21,8 +21,9 @@ namespace app {
     class GincoTask: public StandardTask {
        private:
 
-        enum events {
-            SECOND_EVENT,
+        enum class Event {
+            EVENT_PERIODIC,
+            EVENT_CAN_TRANSMIT
         };
 
         TimerHandle_t timer_;
@@ -36,15 +37,17 @@ namespace app {
 
        public:
 
-        GincoTask(uint32_t priority): StandardTask(priority, 25) {}
+        GincoTask(uint32_t priority): StandardTask(priority, 100) {}
 
-        void handleMessage(GincoMessage& data);
+        void handleCanMessage(GincoMessage& data);
 
         const char* name() const override { return "ginco"; }
 
-        bool secondEvent() { return post(SECOND_EVENT); }
+        bool periodicEvent() { return post(Event::EVENT_PERIODIC); }
 
-        bool transmit(GincoMessage& message) { return can_driver_.transmit(message); }
+        bool transmit(GincoMessage& message) {
+            return post(Event::EVENT_CAN_TRANSMIT, std::make_unique<GincoMessage>(message), 25);
+        }
     };
 
 }  // namespace app

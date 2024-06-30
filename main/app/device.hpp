@@ -15,13 +15,14 @@ namespace app {
         data::GincoMessage ginco_mes_;
         driver::UpgradeHandler upgrade_handler_;
         driver::CanDriver& can_driver_;
+        uint32_t version_numbers_[3];
 
         void requestNewId();
 
        public:
         Device(driver::CanDriver& driver): config_(driver::ConfigDriver::instance()), can_driver_(driver) {};
         void init();
-        void secondTick();
+        void periodic();
         void handleConfig(GincoMessage& message);
         void handleAction(GincoMessage& message);
     };
