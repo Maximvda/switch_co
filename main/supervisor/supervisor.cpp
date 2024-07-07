@@ -37,12 +37,10 @@ namespace app {
         for (;;) {
             if (auto maybe = queue_.tryPop(timeout)) {
                 uint32_t index = findIndex(*maybe);
-                if (index >= 0) {
-                    alive |= (1 << index);
-                    if (alive == all_alive) {
-                        last_tick = xTaskGetTickCount();
-                        alive = 0;
-                    }
+                alive |= (1 << index);
+                if (alive == all_alive) {
+                    last_tick = xTaskGetTickCount();
+                    alive = 0;
                 }
             }
 

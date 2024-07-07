@@ -36,6 +36,13 @@ void GpioTask::handle(Message& message) {
             }
             break;
         }
+        case Event::CONFIGURE_SENSOR: {
+            if (auto value = message.takeValue<std::tuple<uint32_t, ginco::SensorType>>()) {
+                const auto& [index, type] = *value.get();
+                addSensor(index, type);
+                driver::config::storeVector(driver::ConfigKey::SENSOR_LIST, sensors_);
+            }
+        }
         default:
             assert(0);
     }

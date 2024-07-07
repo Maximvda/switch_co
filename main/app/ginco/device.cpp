@@ -107,12 +107,12 @@ void Device::handleConfig(GincoMessage& message) {
             }
             break;
         }
-        case ConfigFunction::ADD_ACTUATOR: {
+        case ConfigFunction::ADD_ACTUATOR:
             addActuator(message.index(), message.data<ginco::ActuatorType>());
             driver::config::storeVector(ConfigKey::ACTUATOR_LIST, actuators_);
             break;
-        }
-        case ConfigFunction::REQUEST_SENSORS: {
+
+        case ConfigFunction::REQUEST_SENSORS:
             app::taskFinder().gpio().inspect([&message]() {
                 auto& sensors = app::taskFinder().gpio().getSensors();
                 for (auto& sensor_variant : sensors) {
@@ -126,9 +126,12 @@ void Device::handleConfig(GincoMessage& message) {
                     message.send();
                 }
             });
-
             break;
-        }
+
+        case ConfigFunction::ADD_SENSOR:
+            app::taskFinder().gpio().configureSensor(message.index(), message.data<ginco::SensorType>());
+            break;
+
         default:
             break;
     }
