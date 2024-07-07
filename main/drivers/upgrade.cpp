@@ -4,8 +4,8 @@
 
 #include "supervisor.hpp"
 
-using data::GincoMessage;
 using driver::UpgradeHandler;
+using ginco::GincoMessage;
 
 const char* TAG = "Upgrade";
 
@@ -26,7 +26,7 @@ bool UpgradeHandler::init(GincoMessage& message) {
 
     ESP_ERROR_CHECK(esp_ota_begin(ota_partition_, image_size_, &update_handle_));
     ESP_LOGI(TAG, "ota begin ok: size %llu", image_size_);
-    message.ack();
+    message.acknowledge();
     return true;
 };
 
@@ -36,7 +36,7 @@ bool UpgradeHandler::handle(GincoMessage& message) {
     if ((mes_received_ % 1000) == 0) {
         ESP_LOGI(TAG, "prog %lu | %llu", mes_received_, image_size_);
     }
-    message.ack();
+    message.acknowledge();
     ESP_ERROR_CHECK(esp_ota_write(update_handle_, message.data<uint8_t*>(), message.length()));
     if (image_size_ == 0) {
         complete();

@@ -1,11 +1,16 @@
 file(GLOB private_lib
     modules/*.cpp
     drivers/*.cpp
-    threads/*.cpp
-    app/*.cpp
+    supervisor/*.cpp
+    app/ginco/*.cpp
+    app/gpio/*.cpp
     defines/*.cpp
+    actuators/*.cpp
+    sensors/*.cpp
     ../common/defines/*.cpp
     ../common/threading/*.cpp
+    ../common/drivers/*.cpp
+    ../common/utils/*.cpp
 )
 
 idf_component_register(
@@ -15,10 +20,15 @@ idf_component_register(
     INCLUDE_DIRS
         "."
         "defines"
-        "threads"
-        "app"
+        "supervisor"
+        "app/ginco"
+        "app/gpio"
         "drivers"
         "modules"
+        "actuators"
+        "sensors"
         "../common/defines"
         "../common/threading"
+        "../common/drivers"
+        "../common/utils"
 )

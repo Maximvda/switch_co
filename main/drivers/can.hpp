@@ -8,15 +8,13 @@
 #include "driver/twai.h"
 
 /* Ginco includes */
-#include "ginco_types.hpp"
-
-using data::GincoMessage;
+#include "ginco_message.hpp"
 
 namespace driver {
 
     class CanDriver {
        private:
-        using MessageCb = std::function<void(GincoMessage mes)>;
+        using MessageCb = std::function<void(ginco::GincoMessage mes)>;
         MessageCb message_cb_;
         /* Id of the module to filter out can messages */
         uint8_t id_ {0};
@@ -25,7 +23,7 @@ namespace driver {
 
        public:
         /* Init module with callback function to process messages */
-        void init(MessageCb cb_fnc);
+        void init(uint8_t id, MessageCb cb_fnc);
 
         /* Check if messages have been received */
         void tick();
@@ -37,7 +35,7 @@ namespace driver {
          * @return true When queued successfully
          * @return false When error occured during queing
          */
-        bool transmit(GincoMessage& message);
+        bool transmit(ginco::GincoMessage& message);
 
         /**
          * @brief Set address of module
